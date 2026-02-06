@@ -42,9 +42,13 @@ private/
 *.secret
 *.private
 
+# Test coverage
+coverage/
+
 # Temporary files
 tmp/
 temp/
+tmp_test_db_*/
 
 # Project-specific generated files (should be generated per project)
 AUDIO_PROMPTS.json

@@ -30,7 +30,8 @@
     ],
     "collectCoverageFrom": [
       "src/**/*.js",
-      "!src/server.js"
+      "!src/server.js",
+      "!src/pdf_converter.js"
     ]
   },
   "engines": {
