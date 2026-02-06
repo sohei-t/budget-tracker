@@ -20,6 +20,7 @@ const state = {
 
 const subscribers = new Map();
 let nextSubscriberId = 0;
+let pendingNotification = null;
 
 /**
  * Get current state (read-only copy for safety).
@@ -61,17 +62,34 @@ export function subscribe(keys, callback) {
 
 /**
  * Notify subscribers of state changes.
+ * Uses microtask batching to coalesce rapid updates into a single notification cycle.
  * @param {string[]} changedKeys - Keys that changed
  */
 function notifySubscribers(changedKeys) {
-  for (const [, sub] of subscribers) {
-    const relevant = sub.keys.some(k => changedKeys.includes(k));
-    if (relevant) {
-      try {
-        sub.callback(state);
-      } catch (err) {
-        console.error('[Store] Subscriber error:', err);
+  if (pendingNotification) {
+    // Merge changed keys with pending notification
+    for (const key of changedKeys) {
+      pendingNotification.add(key);
+    }
+    return;
+  }
+
+  pendingNotification = new Set(changedKeys);
+
+  // Use microtask to batch synchronous setState calls
+  Promise.resolve().then(() => {
+    const keys = pendingNotification;
+    pendingNotification = null;
+
+    for (const [, sub] of subscribers) {
+      const relevant = sub.keys.some(k => keys.has(k));
+      if (relevant) {
+        try {
+          sub.callback(state);
+        } catch (err) {
+          console.error('[Store] Subscriber error:', err);
+        }
       }
     }
-  }
+  });
 }

@@ -5,11 +5,10 @@
  * @module components/searchBar
  */
 
-import { escapeHtml } from '../utils/dom.js';
+import { escapeHtml, debounce } from '../utils/dom.js';
 import { getState } from '../store.js';
 import { navigate } from '../router.js';
 
-let debounceTimer = null;
 let focusIndex = -1;
 
 /**
@@ -33,10 +32,8 @@ export function initSearchBar() {
     }
   });
 
-  input.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => performSearch(input.value), 200);
-  });
+  const debouncedSearch = debounce((value) => performSearch(value), 150);
+  input.addEventListener('input', () => debouncedSearch(input.value));
 
   input.addEventListener('keydown', (e) => {
     const items = results.querySelectorAll('.search-result-item');
@@ -102,17 +99,18 @@ function performSearch(query) {
     </div>
   `).join('');
 
-  results.querySelectorAll('.search-result-item[data-task-id]').forEach(item => {
-    item.addEventListener('click', () => {
-      const id = item.dataset.taskId;
-      navigate(`#/tasks/${id}`);
-      const dropdown = document.getElementById('searchDropdown');
-      if (dropdown) dropdown.hidden = true;
-      const input = document.getElementById('searchInput');
-      if (input) input.value = '';
-      results.innerHTML = '';
-    });
-  });
+  // Use event delegation on the results container (single listener)
+  results.onclick = (e) => {
+    const item = e.target.closest('.search-result-item[data-task-id]');
+    if (!item) return;
+    const id = item.dataset.taskId;
+    navigate(`#/tasks/${id}`);
+    const dropdown = document.getElementById('searchDropdown');
+    if (dropdown) dropdown.hidden = true;
+    const input = document.getElementById('searchInput');
+    if (input) input.value = '';
+    results.innerHTML = '';
+  };
 }
 
 function updateFocus(items) {

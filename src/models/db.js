@@ -58,6 +58,9 @@ const INDEXES = `
   CREATE INDEX IF NOT EXISTS idx_tasks_deleted ON tasks(is_deleted);
   CREATE INDEX IF NOT EXISTS idx_actuals_task ON actuals(task_id);
   CREATE INDEX IF NOT EXISTS idx_actuals_date ON actuals(work_date);
+  CREATE INDEX IF NOT EXISTS idx_tasks_parent_deleted_sort ON tasks(parent_id, is_deleted, sort_order);
+  CREATE INDEX IF NOT EXISTS idx_tasks_level_deleted ON tasks(level, is_deleted);
+  CREATE INDEX IF NOT EXISTS idx_actuals_task_date ON actuals(task_id, work_date);
 `;
 
 const SCHEMA_VERSION = `
@@ -101,8 +104,14 @@ function getDb(dbPath) {
   }
 
   _db = new Database(resolvedPath);
+
+  // Performance-critical PRAGMAs
   _db.pragma('journal_mode = WAL');
   _db.pragma('foreign_keys = ON');
+  _db.pragma('synchronous = NORMAL');    // Safe with WAL, faster than FULL
+  _db.pragma('cache_size = -8000');       // 8MB cache (negative = KB)
+  _db.pragma('temp_store = MEMORY');      // Keep temp tables in memory
+  _db.pragma('mmap_size = 268435456');    // 256MB memory-mapped I/O
 
   initializeSchema(_db);
 

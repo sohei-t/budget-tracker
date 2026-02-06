@@ -118,50 +118,54 @@ function buildRows(topTasks, allTasks, rows) {
 }
 
 /**
- * Attach click handlers to task rows and toggles.
+ * Attach click handlers using event delegation (single listener on container).
  */
 function attachListHandlers() {
   const main = document.getElementById('mainContent');
   if (!main) return;
 
-  // Toggle children
-  main.querySelectorAll('.task-row__toggle').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const id = btn.dataset.toggleId;
-      if (expandedIds.has(id)) {
-        expandedIds.delete(id);
-        btn.classList.remove('expanded');
-      } else {
-        expandedIds.add(id);
-        btn.classList.add('expanded');
-        // Load children if needed
-        const { tasks } = getState();
-        const hasChildren = tasks.some(t => String(t.parent_id) === id);
-        if (!hasChildren) {
-          try {
-            const res = await api.getChildren(id);
-            if (res.data && res.data.length > 0) {
-              const existing = new Set(tasks.map(t => t.id));
-              const newTasks = res.data.filter(t => !existing.has(t.id));
-              setState({ tasks: [...tasks, ...newTasks] });
+  const taskRows = document.getElementById('taskRows');
+  if (taskRows) {
+    // Single delegated event handler for all task row interactions
+    taskRows.addEventListener('click', async (e) => {
+      // Handle toggle button clicks
+      const toggleBtn = e.target.closest('.task-row__toggle');
+      if (toggleBtn) {
+        e.stopPropagation();
+        const id = toggleBtn.dataset.toggleId;
+        if (expandedIds.has(id)) {
+          expandedIds.delete(id);
+          toggleBtn.classList.remove('expanded');
+        } else {
+          expandedIds.add(id);
+          toggleBtn.classList.add('expanded');
+          // Load children if needed
+          const { tasks } = getState();
+          const hasChildren = tasks.some(t => String(t.parent_id) === id);
+          if (!hasChildren) {
+            try {
+              const res = await api.getChildren(id);
+              if (res.data && res.data.length > 0) {
+                const existing = new Set(tasks.map(t => t.id));
+                const newTasks = res.data.filter(t => !existing.has(t.id));
+                setState({ tasks: [...tasks, ...newTasks] });
+              }
+            } catch (err) {
+              showToast('Failed to load children', 'error');
             }
-          } catch (err) {
-            showToast('Failed to load children', 'error');
           }
         }
+        renderTaskList();
+        return;
       }
-      renderTaskList();
-    });
-  });
 
-  // Row click -> detail
-  main.querySelectorAll('.task-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const id = row.dataset.taskId;
-      if (id) navigate(`#/tasks/${id}`);
+      // Handle row click -> navigate to detail
+      const row = e.target.closest('.task-row');
+      if (row && row.dataset.taskId) {
+        navigate(`#/tasks/${row.dataset.taskId}`);
+      }
     });
-  });
+  }
 
   // Update toggle states
   main.querySelectorAll('.task-row__toggle').forEach(btn => {

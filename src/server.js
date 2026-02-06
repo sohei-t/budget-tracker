@@ -45,6 +45,18 @@ app.use(helmet({
 // Compression
 app.use(compression());
 
+// Response time tracking (set header before response is sent)
+app.use((req, res, next) => {
+  req._startTime = process.hrtime.bigint();
+  const originalJson = res.json.bind(res);
+  res.json = function(body) {
+    const elapsed = Number(process.hrtime.bigint() - req._startTime) / 1e6;
+    res.set('X-Response-Time', `${elapsed.toFixed(2)}ms`);
+    return originalJson(body);
+  };
+  next();
+});
+
 // Logging (skip in test)
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
@@ -53,11 +65,19 @@ if (process.env.NODE_ENV !== 'test') {
 // CORS
 app.use(cors());
 
-// JSON body parser
-app.use(express.json({ limit: '1mb' }));
+// JSON body parser with optimized limit
+app.use(express.json({ limit: '256kb' }));
 
-// Static files (SPA frontend)
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// Enable ETag for API responses (weak ETags for JSON)
+app.set('etag', 'weak');
+
+// Static files (SPA frontend) with optimized caching
+app.use(express.static(path.join(__dirname, '..', 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
+  etag: true,
+  lastModified: true,
+  index: 'index.html'
+}));
 
 // API Routes
 app.use('/api/tasks', taskRoutes);

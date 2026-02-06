@@ -52,3 +52,58 @@ export function hideLoading() {
   const spinner = document.getElementById('loadingSpinner');
   if (spinner) spinner.classList.remove('active');
 }
+
+/**
+ * Debounce a function call.
+ * @param {Function} fn - Function to debounce
+ * @param {number} delay - Delay in milliseconds
+ * @returns {Function} Debounced function
+ */
+export function debounce(fn, delay) {
+  let timer = null;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+/**
+ * Throttle a function call.
+ * @param {Function} fn - Function to throttle
+ * @param {number} limit - Minimum interval in milliseconds
+ * @returns {Function} Throttled function
+ */
+export function throttle(fn, limit) {
+  let lastCall = 0;
+  let timer = null;
+  return function(...args) {
+    const now = Date.now();
+    const remaining = limit - (now - lastCall);
+    clearTimeout(timer);
+    if (remaining <= 0) {
+      lastCall = now;
+      fn.apply(this, args);
+    } else {
+      timer = setTimeout(() => {
+        lastCall = Date.now();
+        fn.apply(this, args);
+      }, remaining);
+    }
+  };
+}
+
+/**
+ * Batch DOM updates using DocumentFragment.
+ * @param {HTMLElement} container - Container to append to
+ * @param {string[]} htmlItems - Array of HTML strings to add
+ */
+export function batchAppend(container, htmlItems) {
+  const fragment = document.createDocumentFragment();
+  const template = document.createElement('template');
+  for (const html of htmlItems) {
+    template.innerHTML = html.trim();
+    const node = template.content.firstChild;
+    if (node) fragment.appendChild(node);
+  }
+  container.appendChild(fragment);
+}

@@ -137,10 +137,11 @@ function renderDashboard() {
     </div>
   `);
 
-  // Attach click handlers for navigation
-  main.querySelectorAll('[data-task-id]').forEach(el => {
-    el.addEventListener('click', () => {
-      navigate(`#/tasks/${el.dataset.taskId}`);
-    });
+  // Use event delegation for navigation (single listener instead of N listeners)
+  main.addEventListener('click', (e) => {
+    const target = e.target.closest('[data-task-id]');
+    if (target) {
+      navigate(`#/tasks/${target.dataset.taskId}`);
+    }
   });
 }

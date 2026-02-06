@@ -2,6 +2,7 @@
  * Dashboard Service
  *
  * Provides aggregated statistics for the project dashboard.
+ * Optimized to use batch queries instead of per-task enrichment (N+1 elimination).
  * @module services/dashboardService
  */
 
@@ -12,45 +13,69 @@ const progressService = require('./progressService');
 
 /**
  * Gets overall project summary statistics.
+ * Uses batch queries and in-memory computation to minimize database round trips.
  * @param {Database} [db] - Optional database instance
  * @returns {Object} Dashboard summary data
  */
 function getSummary(db) {
-  const allTasks = taskModel.findAll(db);
+  // Single query to get all tasks with cumulative hours (eliminates N+1)
+  const allTasks = taskModel.findAllWithCumulativeHours(db);
+  const childrenCountsMap = taskModel.getChildrenCountsMap(db);
 
   const totalTasks = allTasks.length;
   const completedTasks = allTasks.filter(t => t.status === 'completed').length;
   const inProgressTasks = allTasks.filter(t => t.status === 'in_progress').length;
   const notStartedTasks = allTasks.filter(t => t.status === 'not_started').length;
 
+  // Build task lookup map for efficient parent-child traversal
+  const taskMap = new Map();
+  for (const t of allTasks) {
+    taskMap.set(t.id, t);
+  }
+
+  // Build children map for in-memory hierarchy traversal
+  const childrenMap = new Map();
+  for (const t of allTasks) {
+    if (t.parent_id !== null) {
+      if (!childrenMap.has(t.parent_id)) {
+        childrenMap.set(t.parent_id, []);
+      }
+      childrenMap.get(t.parent_id).push(t);
+    }
+  }
+
+  // Calculate progress for all tasks in memory (bottom-up)
+  const progressMap = new Map();
+  calculateProgressBatch(allTasks, childrenMap, progressMap);
+
   // Calculate overall progress from Level 1 tasks
   const level1Tasks = allTasks.filter(t => t.level === 1);
   let overallProgress = 0;
 
   if (level1Tasks.length > 0) {
-    const enrichedLevel1 = level1Tasks.map(t => progressService.enrichTask(t, db));
-    const totalEffort = enrichedLevel1.reduce((sum, t) => sum + (t.planned_effort_hours || 0), 0);
+    const totalEffort = level1Tasks.reduce((sum, t) => sum + (t.planned_effort_hours || 0), 0);
 
     if (totalEffort > 0) {
-      const weightedSum = enrichedLevel1.reduce(
-        (sum, t) => sum + t.progress_percent * (t.planned_effort_hours || 0), 0
+      const weightedSum = level1Tasks.reduce(
+        (sum, t) => sum + (progressMap.get(t.id) || 0) * (t.planned_effort_hours || 0), 0
       );
       overallProgress = Math.round((weightedSum / totalEffort) * 10) / 10;
     } else {
-      const avgProgress = enrichedLevel1.reduce((sum, t) => sum + t.progress_percent, 0) / enrichedLevel1.length;
+      const avgProgress = level1Tasks.reduce((sum, t) => sum + (progressMap.get(t.id) || 0), 0) / level1Tasks.length;
       overallProgress = Math.round(avgProgress * 10) / 10;
     }
   }
 
-  // Delay counts
+  // Delay counts using in-memory progress values
   let overdueCount = 0;
   let atRiskCount = 0;
   let onTrackCount = 0;
 
   for (const task of allTasks) {
-    const enriched = progressService.enrichTask(task, db);
-    if (enriched.delay_status === 'overdue') overdueCount++;
-    else if (enriched.delay_status === 'at_risk') atRiskCount++;
+    const progress = progressMap.get(task.id) || 0;
+    const delay = progressService.calculateDelayStatus(task, progress);
+    if (delay.status === 'overdue') overdueCount++;
+    else if (delay.status === 'at_risk') atRiskCount++;
     else onTrackCount++;
   }
 
@@ -69,15 +94,16 @@ function getSummary(db) {
     }
   }
 
-  // Major items summary
+  // Major items summary using cached progress
   const majorItems = level1Tasks.map(t => {
-    const enriched = progressService.enrichTask(t, db);
+    const progress = progressMap.get(t.id) || 0;
+    const delay = progressService.calculateDelayStatus(t, progress);
     return {
-      id: enriched.id,
-      name: enriched.name,
-      progress_percent: enriched.progress_percent,
-      status: enriched.status,
-      delay_status: enriched.delay_status
+      id: t.id,
+      name: t.name,
+      progress_percent: progress,
+      status: t.status,
+      delay_status: delay.status
     };
   });
 
@@ -97,30 +123,97 @@ function getSummary(db) {
 }
 
 /**
+ * Batch-calculates progress for all tasks in memory.
+ * Processes leaf tasks first (by highest level), then parents.
+ * @param {Array<Object>} allTasks - All tasks with cumulative_hours field
+ * @param {Map<number, Array>} childrenMap - Parent ID -> children array
+ * @param {Map<number, number>} progressMap - Task ID -> progress (output)
+ */
+function calculateProgressBatch(allTasks, childrenMap, progressMap) {
+  // Sort by level descending (leaves first)
+  const sortedTasks = [...allTasks].sort((a, b) => b.level - a.level);
+
+  for (const task of sortedTasks) {
+    const children = childrenMap.get(task.id) || [];
+
+    if (children.length > 0) {
+      // Parent task: weighted average of children
+      const childProgresses = children.map(child => ({
+        progress: progressMap.get(child.id) || 0,
+        effort: child.planned_effort_hours || 0
+      }));
+
+      const totalEffort = childProgresses.reduce((sum, c) => sum + c.effort, 0);
+
+      if (totalEffort > 0) {
+        const weightedSum = childProgresses.reduce(
+          (sum, c) => sum + c.progress * c.effort, 0
+        );
+        progressMap.set(task.id, Math.round((weightedSum / totalEffort) * 10) / 10);
+      } else {
+        const avg = childProgresses.reduce((sum, c) => sum + c.progress, 0) / childProgresses.length;
+        progressMap.set(task.id, Math.round(avg * 10) / 10);
+      }
+    } else {
+      // Leaf task
+      if (task.progress_mode === 'manual') {
+        progressMap.set(task.id, task.progress_percent);
+      } else {
+        const cumulative = task.cumulative_hours || 0;
+        if (task.planned_effort_hours > 0) {
+          const raw = (cumulative / task.planned_effort_hours) * 100;
+          progressMap.set(task.id, Math.round(Math.min(100, raw) * 10) / 10);
+        } else {
+          progressMap.set(task.id, task.status === 'completed' ? 100 : 0);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Gets list of delayed tasks (overdue and at_risk).
+ * Optimized to use batch progress calculation.
  * @param {Database} [db] - Optional database instance
  * @returns {Array<Object>} List of delayed tasks sorted by severity
  */
 function getDelayedTasks(db) {
-  const allTasks = taskModel.findAll(db);
+  const allTasks = taskModel.findAllWithCumulativeHours(db);
   const delayed = [];
+
+  // Build children map for in-memory hierarchy traversal
+  const childrenMap = new Map();
+  for (const t of allTasks) {
+    if (t.parent_id !== null) {
+      if (!childrenMap.has(t.parent_id)) {
+        childrenMap.set(t.parent_id, []);
+      }
+      childrenMap.get(t.parent_id).push(t);
+    }
+  }
+
+  // Batch calculate progress
+  const progressMap = new Map();
+  calculateProgressBatch(allTasks, childrenMap, progressMap);
 
   for (const task of allTasks) {
     if (!task.planned_start_date || !task.planned_end_date) continue;
 
-    const enriched = progressService.enrichTask(task, db);
+    const progress = progressMap.get(task.id) || 0;
+    const delay = progressService.calculateDelayStatus(task, progress);
+    const warning = progressService.getWarningLevel(task, progress);
 
-    if (enriched.delay_status === 'overdue' || enriched.delay_status === 'at_risk') {
+    if (delay.status === 'overdue' || delay.status === 'at_risk') {
       delayed.push({
-        id: enriched.id,
-        name: enriched.name,
-        level: enriched.level,
-        planned_end_date: enriched.planned_end_date,
-        progress_percent: enriched.progress_percent,
-        delay_status: enriched.delay_status,
-        delay_days: enriched.delay_days,
-        expected_progress: enriched.expected_progress,
-        warning_level: enriched.warning_level
+        id: task.id,
+        name: task.name,
+        level: task.level,
+        planned_end_date: task.planned_end_date,
+        progress_percent: progress,
+        delay_status: delay.status,
+        delay_days: delay.delay_days,
+        expected_progress: delay.expected_progress,
+        warning_level: warning
       });
     }
   }

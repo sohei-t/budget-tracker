@@ -212,6 +212,47 @@ function findAll(db) {
   return _db.prepare('SELECT * FROM tasks WHERE is_deleted = 0 ORDER BY level ASC, sort_order ASC').all();
 }
 
+/**
+ * Finds all non-deleted tasks with pre-computed cumulative hours (single JOIN query).
+ * Eliminates the N+1 query problem when enriching multiple tasks.
+ * @param {Database} [db] - Optional database instance
+ * @returns {Array<Object>} All non-deleted tasks with cumulative_hours field
+ */
+function findAllWithCumulativeHours(db) {
+  const _db = db || getDb();
+  return _db.prepare(`
+    SELECT t.*, COALESCE(a.total_hours, 0) as cumulative_hours
+    FROM tasks t
+    LEFT JOIN (
+      SELECT task_id, SUM(actual_hours) as total_hours
+      FROM actuals
+      GROUP BY task_id
+    ) a ON t.id = a.task_id
+    WHERE t.is_deleted = 0
+    ORDER BY t.level ASC, t.sort_order ASC
+  `).all();
+}
+
+/**
+ * Gets children counts for all non-deleted tasks in a single query.
+ * @param {Database} [db] - Optional database instance
+ * @returns {Map<number, number>} Map of task_id -> children_count
+ */
+function getChildrenCountsMap(db) {
+  const _db = db || getDb();
+  const rows = _db.prepare(`
+    SELECT parent_id, COUNT(*) as count
+    FROM tasks
+    WHERE parent_id IS NOT NULL AND is_deleted = 0
+    GROUP BY parent_id
+  `).all();
+  const map = new Map();
+  for (const row of rows) {
+    map.set(row.parent_id, row.count);
+  }
+  return map;
+}
+
 module.exports = {
   findTopLevel,
   findById,
@@ -222,5 +263,7 @@ module.exports = {
   create,
   update,
   softDelete,
-  findAll
+  findAll,
+  findAllWithCumulativeHours,
+  getChildrenCountsMap
 };
