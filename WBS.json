@@ -1,0 +1,503 @@
+{
+  "project": {
+    "name": "Budget Tracker - WBS Task & Progress Manager",
+    "description": "WBS-like task management web app with planned/actual tracking, progress visualization, and delay warnings",
+    "start_date": "2026-02-06",
+    "estimated_duration": "5 days",
+    "architecture": "Node.js + Express + SQLite + Vanilla JS (Conservative/Monolithic MVC)",
+    "critical_path": ["T001", "T003", "T005", "T007", "T009", "T012", "T015", "T017", "T019"]
+  },
+  "tasks": [
+    {
+      "id": "T001",
+      "name": "API Specification & Data Model Definition",
+      "description": "Define RESTful API endpoints, request/response schemas, and SQLite database schema with indexes",
+      "agent": "architect",
+      "dependencies": [],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "API_DESIGN.md, database schema SQL",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "design"
+    },
+    {
+      "id": "T002",
+      "name": "Project Scaffolding & Configuration",
+      "description": "Initialize Node.js project, install dependencies, configure Express, setup directory structure",
+      "agent": "backend_dev",
+      "dependencies": [],
+      "estimated_hours": 1,
+      "status": "pending",
+      "output": "package.json, server.js skeleton, directory structure",
+      "priority": "high",
+      "parallel_group": "setup",
+      "phase": "setup"
+    },
+    {
+      "id": "T003",
+      "name": "Database Layer Implementation",
+      "description": "Implement SQLite connection, schema creation, migration system, and base model classes using better-sqlite3",
+      "agent": "db_expert",
+      "dependencies": ["T001", "T002"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "src/models/db.js, schema SQL files",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T004",
+      "name": "Task Model Implementation",
+      "description": "Implement Task model with CRUD operations, hierarchy queries (parent/children), soft delete, and sort order",
+      "agent": "db_expert",
+      "dependencies": ["T003"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "src/models/taskModel.js",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T005",
+      "name": "Actual Model Implementation",
+      "description": "Implement Actual model with daily recording (upsert), cumulative queries, and date-based filtering",
+      "agent": "db_expert",
+      "dependencies": ["T003"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "src/models/actualModel.js",
+      "priority": "high",
+      "parallel_group": "models",
+      "phase": "implementation"
+    },
+    {
+      "id": "T006",
+      "name": "Progress & Delay Calculation Service",
+      "description": "Implement progressService with auto-progress calculation, parent aggregation, delay detection, and warning thresholds",
+      "agent": "backend_dev",
+      "dependencies": ["T004", "T005"],
+      "estimated_hours": 4,
+      "status": "pending",
+      "output": "src/services/progressService.js",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T007",
+      "name": "Task Service Layer",
+      "description": "Business logic for task CRUD, cascading operations, validation, and progress integration",
+      "agent": "backend_dev",
+      "dependencies": ["T004", "T006"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "src/services/taskService.js",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T008",
+      "name": "Actual Service Layer",
+      "description": "Business logic for daily actual recording, upsert handling, and progress recalculation trigger",
+      "agent": "backend_dev",
+      "dependencies": ["T005", "T006"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "src/services/actualService.js",
+      "priority": "high",
+      "parallel_group": "services",
+      "phase": "implementation"
+    },
+    {
+      "id": "T009",
+      "name": "Task API Routes & Controller",
+      "description": "Implement REST endpoints for tasks: GET list, GET by ID, GET children, POST create, PUT update, DELETE soft-delete, PUT reorder",
+      "agent": "backend_dev",
+      "dependencies": ["T007"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "src/routes/taskRoutes.js, src/controllers/taskController.js",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T010",
+      "name": "Actual API Routes & Controller",
+      "description": "Implement REST endpoints for actuals: GET by task, POST record, PUT update, DELETE remove",
+      "agent": "backend_dev",
+      "dependencies": ["T008"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "src/routes/actualRoutes.js, src/controllers/actualController.js",
+      "priority": "high",
+      "parallel_group": "routes",
+      "phase": "implementation"
+    },
+    {
+      "id": "T011",
+      "name": "Dashboard Service & API",
+      "description": "Implement dashboard summary statistics: total tasks, completion rate, delay count, overall progress",
+      "agent": "backend_dev",
+      "dependencies": ["T007", "T008"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "src/services/dashboardService.js, src/routes/dashboardRoutes.js",
+      "priority": "high",
+      "parallel_group": "routes",
+      "phase": "implementation"
+    },
+    {
+      "id": "T012",
+      "name": "Input Validation & Sanitization Middleware",
+      "description": "Server-side validation for all inputs, XSS sanitization, error formatting middleware",
+      "agent": "backend_dev",
+      "dependencies": ["T009", "T010"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "src/middleware/validator.js, src/middleware/sanitizer.js, src/middleware/errorHandler.js",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T013",
+      "name": "LAN Network Configuration",
+      "description": "Implement 0.0.0.0 binding, local IP detection, CORS configuration for LAN access",
+      "agent": "backend_dev",
+      "dependencies": ["T002"],
+      "estimated_hours": 1,
+      "status": "pending",
+      "output": "src/utils/networkUtils.js, CORS config",
+      "priority": "high",
+      "parallel_group": "setup",
+      "phase": "implementation"
+    },
+    {
+      "id": "T014",
+      "name": "CSS Design System & Layout",
+      "description": "Create CSS variables, base layout, responsive grid, status colors, progress bar styles, gray-out completed styles",
+      "agent": "frontend_dev",
+      "dependencies": ["T001"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "public/css/main.css, public/css/components.css, public/css/responsive.css",
+      "priority": "high",
+      "parallel_group": "frontend",
+      "phase": "implementation"
+    },
+    {
+      "id": "T015",
+      "name": "Dashboard Page UI",
+      "description": "Frontend dashboard with summary widgets, overall progress chart, delay alerts panel",
+      "agent": "frontend_dev",
+      "dependencies": ["T011", "T014"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "public/js/components/dashboard.js, views/index.ejs",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T016",
+      "name": "API Client Module",
+      "description": "Fetch API wrapper with error handling, loading states, and response parsing",
+      "agent": "frontend_dev",
+      "dependencies": ["T009", "T010"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "public/js/api.js",
+      "priority": "high",
+      "parallel_group": "frontend",
+      "phase": "implementation"
+    },
+    {
+      "id": "T017",
+      "name": "Task List & Drill-Down UI",
+      "description": "Major items grid, drill-down navigation, breadcrumb, task rows with progress bars, status badges, color-coded dates",
+      "agent": "frontend_dev",
+      "dependencies": ["T014", "T016"],
+      "estimated_hours": 5,
+      "status": "pending",
+      "output": "public/js/components/taskList.js, taskRow.js, breadcrumb.js",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T018",
+      "name": "Task Create/Edit Form UI",
+      "description": "Modal dialog for task creation, inline editing for task properties, date pickers, validation feedback",
+      "agent": "frontend_dev",
+      "dependencies": ["T016", "T017"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "public/js/components/taskForm.js",
+      "priority": "high",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T019",
+      "name": "Daily Actual Input UI",
+      "description": "Form for recording daily actuals per task, history view, cumulative summary display",
+      "agent": "frontend_dev",
+      "dependencies": ["T016", "T017"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "public/js/components/actualForm.js",
+      "priority": "critical",
+      "parallel_group": null,
+      "phase": "implementation"
+    },
+    {
+      "id": "T020",
+      "name": "Search & Filter UI",
+      "description": "Search bar, status filter, date range filter, result highlighting",
+      "agent": "frontend_dev",
+      "dependencies": ["T017"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "public/js/components/searchBar.js",
+      "priority": "medium",
+      "parallel_group": "ux_enhancements",
+      "phase": "implementation"
+    },
+    {
+      "id": "T021",
+      "name": "Warning & Notification System UI",
+      "description": "Toast notifications for save/error feedback, delay warning badges, visual alert indicators",
+      "agent": "frontend_dev",
+      "dependencies": ["T017"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "public/js/components/toast.js, warning indicators in task rows",
+      "priority": "high",
+      "parallel_group": "ux_enhancements",
+      "phase": "implementation"
+    },
+    {
+      "id": "T022",
+      "name": "Unit Tests - Models",
+      "description": "Jest tests for taskModel and actualModel: CRUD operations, hierarchy queries, constraints",
+      "agent": "test_designer",
+      "dependencies": ["T004", "T005"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "tests/unit/models/taskModel.test.js, actualModel.test.js",
+      "priority": "high",
+      "parallel_group": "testing",
+      "phase": "testing"
+    },
+    {
+      "id": "T023",
+      "name": "Unit Tests - Services",
+      "description": "Jest tests for progressService, taskService, actualService: calculation accuracy, edge cases, cascading",
+      "agent": "test_designer",
+      "dependencies": ["T006", "T007", "T008"],
+      "estimated_hours": 4,
+      "status": "pending",
+      "output": "tests/unit/services/progressService.test.js, taskService.test.js, actualService.test.js",
+      "priority": "critical",
+      "parallel_group": "testing",
+      "phase": "testing"
+    },
+    {
+      "id": "T024",
+      "name": "Integration Tests - API",
+      "description": "Supertest integration tests for all API endpoints: happy path, error cases, validation",
+      "agent": "test_designer",
+      "dependencies": ["T009", "T010", "T011", "T012"],
+      "estimated_hours": 4,
+      "status": "pending",
+      "output": "tests/integration/taskApi.test.js, actualApi.test.js, dashboardApi.test.js",
+      "priority": "critical",
+      "parallel_group": "testing",
+      "phase": "testing"
+    },
+    {
+      "id": "T025",
+      "name": "E2E Integration - Frontend+Backend",
+      "description": "End-to-end flow testing: create task hierarchy, input actuals, verify progress calculation, check delay warnings",
+      "agent": "tester",
+      "dependencies": ["T017", "T018", "T019", "T024"],
+      "estimated_hours": 3,
+      "status": "pending",
+      "output": "tests/e2e/ test scenarios",
+      "priority": "high",
+      "parallel_group": null,
+      "phase": "testing"
+    },
+    {
+      "id": "T026",
+      "name": "Performance Optimization",
+      "description": "SQLite query optimization (indexes, query plans), frontend bundle review, lazy loading assessment",
+      "agent": "evaluator",
+      "dependencies": ["T025"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "Performance test results, optimized queries",
+      "priority": "medium",
+      "parallel_group": "quality",
+      "phase": "quality"
+    },
+    {
+      "id": "T027",
+      "name": "Security Review & Hardening",
+      "description": "Verify XSS prevention, SQL injection protection, Helmet configuration, input sanitization completeness",
+      "agent": "evaluator",
+      "dependencies": ["T025"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "Security audit report, fixes applied",
+      "priority": "high",
+      "parallel_group": "quality",
+      "phase": "quality"
+    },
+    {
+      "id": "T028",
+      "name": "Responsive Design Verification",
+      "description": "Test tablet/desktop layouts, touch targets, font sizing at different viewports",
+      "agent": "frontend_dev",
+      "dependencies": ["T025"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "Responsive fixes applied",
+      "priority": "medium",
+      "parallel_group": "quality",
+      "phase": "quality"
+    },
+    {
+      "id": "T029",
+      "name": "Documentation & README",
+      "description": "Generate README.md, about.html, usage guide, launch_app.command",
+      "agent": "documenter",
+      "dependencies": ["T025"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "README.md, about.html, launch_app.command",
+      "priority": "high",
+      "parallel_group": "delivery",
+      "phase": "delivery"
+    },
+    {
+      "id": "T030",
+      "name": "Final Review & Polish",
+      "description": "Final pass on UX, error messages, edge cases, code cleanup, console.log removal",
+      "agent": "reviewer",
+      "dependencies": ["T026", "T027", "T028", "T029"],
+      "estimated_hours": 2,
+      "status": "pending",
+      "output": "review-report.md, final polished code",
+      "priority": "high",
+      "parallel_group": null,
+      "phase": "delivery"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Design & Setup Complete",
+      "tasks": ["T001", "T002"],
+      "target_date": "Day 1",
+      "criteria": "API spec and database schema defined, project scaffold ready"
+    },
+    {
+      "id": "M2",
+      "name": "Backend Core Complete",
+      "tasks": ["T003", "T004", "T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013"],
+      "target_date": "Day 2-3",
+      "criteria": "All API endpoints functional, database operations verified"
+    },
+    {
+      "id": "M3",
+      "name": "Frontend Complete",
+      "tasks": ["T014", "T015", "T016", "T017", "T018", "T019", "T020", "T021"],
+      "target_date": "Day 3-4",
+      "criteria": "All pages functional, progress/delay visualization working"
+    },
+    {
+      "id": "M4",
+      "name": "Testing Complete",
+      "tasks": ["T022", "T023", "T024", "T025"],
+      "target_date": "Day 4",
+      "criteria": "All tests passing, 80%+ coverage on business logic"
+    },
+    {
+      "id": "M5",
+      "name": "Quality & Delivery Complete",
+      "tasks": ["T026", "T027", "T028", "T029", "T030"],
+      "target_date": "Day 5",
+      "criteria": "Performance optimized, security verified, documentation ready"
+    }
+  ],
+  "execution_rules": {
+    "max_parallel_tasks": 3,
+    "check_interval_seconds": 30,
+    "timeout_hours": 24,
+    "retry_on_failure": true,
+    "auto_escalate": true
+  },
+  "parallel_execution_plan": {
+    "step_1": {
+      "tasks": ["T001", "T002"],
+      "duration": "2h",
+      "description": "API spec + project scaffolding in parallel"
+    },
+    "step_2": {
+      "tasks": ["T003", "T013", "T014"],
+      "duration": "3h",
+      "description": "Database layer + LAN config + CSS design system in parallel"
+    },
+    "step_3": {
+      "tasks": ["T004", "T005"],
+      "duration": "3h",
+      "description": "Task model + Actual model in parallel"
+    },
+    "step_4": {
+      "tasks": ["T006"],
+      "duration": "4h",
+      "description": "Progress/delay calculation (critical, depends on both models)"
+    },
+    "step_5": {
+      "tasks": ["T007", "T008", "T022"],
+      "duration": "3h",
+      "description": "Task service + Actual service + Model unit tests in parallel"
+    },
+    "step_6": {
+      "tasks": ["T009", "T010", "T011", "T016"],
+      "duration": "3h",
+      "description": "API routes + API client in parallel"
+    },
+    "step_7": {
+      "tasks": ["T012", "T015", "T017", "T023"],
+      "duration": "5h",
+      "description": "Validation middleware + Dashboard UI + Task list UI + Service tests in parallel"
+    },
+    "step_8": {
+      "tasks": ["T018", "T019", "T020", "T021", "T024"],
+      "duration": "4h",
+      "description": "Task form + Actual form + Search + Warnings + Integration tests in parallel"
+    },
+    "step_9": {
+      "tasks": ["T025"],
+      "duration": "3h",
+      "description": "E2E integration testing"
+    },
+    "step_10": {
+      "tasks": ["T026", "T027", "T028", "T029"],
+      "duration": "2h",
+      "description": "Quality checks + documentation in parallel"
+    },
+    "step_11": {
+      "tasks": ["T030"],
+      "duration": "2h",
+      "description": "Final review and polish"
+    }
+  }
+}
