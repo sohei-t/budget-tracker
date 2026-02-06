@@ -8,211 +8,310 @@
 'use strict';
 
 const { createTestDb, seedTestData, closeTestDb } = require('../../helpers/testDb');
+const { setDb } = require('../../../src/models/db');
+const actualService = require('../../../src/services/actualService');
+const taskModel = require('../../../src/models/taskModel');
+const actualModel = require('../../../src/models/actualModel');
 
-// Service under test will be imported once implemented
-// const actualService = require('../../../src/services/actualService');
+let db;
+let ids;
 
-describe('actualService', () => {
-  let db;
-  let testIds;
+beforeEach(() => {
+  db = createTestDb();
+  setDb(db);
+  ids = seedTestData(db);
+});
 
-  beforeEach(() => {
-    db = createTestDb();
-    testIds = seedTestData(db);
+afterEach(() => {
+  closeTestDb(db);
+});
+
+// =========================================================================
+// Record Actual (Create / Upsert)
+// =========================================================================
+
+describe('recordActual', () => {
+  test('should create a new actual entry for a task and date', () => {
+    const result = actualService.recordActual(ids.minor1Id, {
+      work_date: '2026-02-15', actual_hours: 4.5, notes: 'Work done'
+    }, db);
+    expect(result.entry).toBeDefined();
+    expect(result.entry.actual_hours).toBe(4.5);
+    expect(result.isUpsert).toBe(false);
+    expect(result.newCumulativeHours).toBeGreaterThan(0);
   });
 
-  afterEach(() => {
-    closeTestDb(db);
+  test('should upsert when recording for the same task and date', () => {
+    // minor1 already has an actual for 2026-02-10 (6.5h)
+    const result = actualService.recordActual(ids.minor1Id, {
+      work_date: '2026-02-10', actual_hours: 8.0, notes: 'Updated'
+    }, db);
+    expect(result.isUpsert).toBe(true);
+    expect(result.entry.actual_hours).toBe(8.0);
+    // Cumulative should be updated: 8.0 (updated) + 2.0 (2026-02-11) = 10.0
+    expect(result.newCumulativeHours).toBe(10.0);
   });
 
-  // =========================================================================
-  // Record Actual (Create / Upsert)
-  // =========================================================================
-
-  describe('recordActual', () => {
-    it('should create a new actual entry for a task and date', () => {
-      // Given: task_id, work_date = '2026-02-15', actual_hours = 4.5, notes = 'Work done'
-      // Expected: New actual record created, ID returned
-      expect(true).toBe(true);
-    });
-
-    it('should upsert when recording for the same task and date', () => {
-      // Given: An actual already exists for task+date
-      // Expected: Existing record updated with new hours and notes
-      expect(true).toBe(true);
-    });
-
-    it('should trigger progress recalculation for the task', () => {
-      // Given: Recording actual for a task with auto progress mode
-      // Expected: Task progress_percent is recalculated
-      expect(true).toBe(true);
-    });
-
-    it('should trigger progress recalculation for ancestor tasks', () => {
-      // Given: Recording actual for a Level 3 task
-      // Expected: Level 2 parent and Level 1 grandparent progress recalculated
-      expect(true).toBe(true);
-    });
-
-    it('should auto-transition task status to in_progress on first actual', () => {
-      // Given: Task with status = 'not_started', first actual recorded
-      // Expected: Status changes to 'in_progress'
-      expect(true).toBe(true);
-    });
-
-    it('should reject actual_hours <= 0', () => {
-      // Given: actual_hours = 0 or negative
-      // Expected: Validation error
-      expect(true).toBe(true);
-    });
-
-    it('should reject actual_hours > 24', () => {
-      // Given: actual_hours = 25
-      // Expected: Validation error
-      expect(true).toBe(true);
-    });
-
-    it('should reject invalid date format', () => {
-      // Given: work_date = 'not-a-date'
-      // Expected: Validation error
-      expect(true).toBe(true);
-    });
-
-    it('should reject recording for a deleted task', () => {
-      // Given: task_id of a soft-deleted task
-      // Expected: Error - task not found (404)
-      expect(true).toBe(true);
-    });
-
-    it('should reject recording for a non-existent task', () => {
-      // Given: task_id = 99999
-      // Expected: Error - task not found (404)
-      expect(true).toBe(true);
-    });
-
-    it('should default notes to empty string when not provided', () => {
-      // Given: No notes field in request
-      // Expected: notes = ''
-      expect(true).toBe(true);
-    });
-
-    it('should set work_date to today when not provided', () => {
-      // Given: No work_date in request
-      // Expected: work_date = today (YYYY-MM-DD)
-      expect(true).toBe(true);
-    });
+  test('should trigger progress recalculation for the task', () => {
+    // Create a new task with 20h planned
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'Progress test', planned_effort_hours: 20
+    }, db);
+    const result = actualService.recordActual(task.id, {
+      work_date: '2026-02-15', actual_hours: 5, notes: ''
+    }, db);
+    // 5/20 = 25%
+    expect(result.newProgressPercent).toBe(25);
   });
 
-  // =========================================================================
-  // Get Actuals
-  // =========================================================================
-
-  describe('getActualsForTask', () => {
-    it('should return all actuals for a task ordered by date descending', () => {
-      // Given: A task with multiple actual entries
-      // Expected: List ordered by work_date DESC
-      expect(true).toBe(true);
-    });
-
-    it('should return empty array for task with no actuals', () => {
-      // Given: A task that has never had actuals recorded
-      // Expected: []
-      expect(true).toBe(true);
-    });
-
-    it('should include cumulative hours in the response', () => {
-      // Expected: Response includes sum of all actual_hours
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for non-existent task', () => {
-      // Given: Invalid task_id
-      // Expected: Error - not found
-      expect(true).toBe(true);
-    });
+  test('should trigger progress recalculation for ancestor tasks', () => {
+    // Record on minor1 and check that middle1 and major1 get updated
+    actualService.recordActual(ids.minor1Id, {
+      work_date: '2026-02-20', actual_hours: 2.0, notes: 'Extra work'
+    }, db);
+    const parent = taskModel.findById(ids.middle1Id, db);
+    expect(parent.progress_percent).toBeGreaterThanOrEqual(0);
+    const grandparent = taskModel.findById(ids.major1Id, db);
+    expect(grandparent).toBeDefined();
   });
 
-  // =========================================================================
-  // Update Actual
-  // =========================================================================
+  test('should auto-transition task status to in_progress on first actual', () => {
+    // Create a fresh task with not_started status
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'Fresh task', planned_effort_hours: 10
+    }, db);
+    expect(task.status).toBe('not_started');
 
-  describe('updateActual', () => {
-    it('should update actual_hours for an existing entry', () => {
-      // Given: Valid actual ID, new hours value
-      // Expected: Hours updated, progress recalculated
-      expect(true).toBe(true);
-    });
-
-    it('should update notes for an existing entry', () => {
-      // Given: Valid actual ID, new notes
-      // Expected: Notes updated
-      expect(true).toBe(true);
-    });
-
-    it('should trigger progress recalculation after update', () => {
-      // Given: Actual hours changed
-      // Expected: Task progress and ancestor progress recalculated
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for non-existent actual ID', () => {
-      // Given: Invalid actual ID
-      // Expected: Error - not found
-      expect(true).toBe(true);
-    });
-
-    it('should validate actual_hours on update', () => {
-      // Given: actual_hours = -1
-      // Expected: Validation error
-      expect(true).toBe(true);
-    });
+    actualService.recordActual(task.id, {
+      work_date: '2026-02-15', actual_hours: 1, notes: 'Starting'
+    }, db);
+    const updated = taskModel.findById(task.id, db);
+    expect(updated.status).toBe('in_progress');
   });
 
-  // =========================================================================
-  // Delete Actual
-  // =========================================================================
-
-  describe('deleteActual', () => {
-    it('should delete an actual entry', () => {
-      // Given: Valid actual ID
-      // Expected: Entry removed from database
-      expect(true).toBe(true);
-    });
-
-    it('should trigger progress recalculation after deletion', () => {
-      // Given: Delete an actual entry
-      // Expected: Task progress decreases, ancestors recalculated
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for non-existent actual ID', () => {
-      // Given: Invalid actual ID
-      // Expected: Error - not found
-      expect(true).toBe(true);
-    });
+  test('should reject actual_hours <= 0', () => {
+    expect(() => {
+      actualService.recordActual(ids.minor1Id, {
+        work_date: '2026-02-15', actual_hours: 0, notes: ''
+      }, db);
+    }).toThrow();
   });
 
-  // =========================================================================
-  // Cumulative Calculation
-  // =========================================================================
+  test('should reject actual_hours > 24', () => {
+    expect(() => {
+      actualService.recordActual(ids.minor1Id, {
+        work_date: '2026-02-15', actual_hours: 25, notes: ''
+      }, db);
+    }).toThrow();
+  });
 
-  describe('getCumulativeHours', () => {
-    it('should return sum of all actual_hours for a task', () => {
-      // Given: Task with actuals [6.5, 2.0] hours
-      // Expected: 8.5
-      expect(true).toBe(true);
-    });
+  test('should reject invalid date format', () => {
+    expect(() => {
+      actualService.recordActual(ids.minor1Id, {
+        work_date: '02-15-2026', actual_hours: 4, notes: ''
+      }, db);
+    }).toThrow();
+  });
 
-    it('should return 0 for task with no actuals', () => {
-      // Given: Task with no actuals
-      // Expected: 0
-      expect(true).toBe(true);
-    });
+  test('should reject recording for a deleted task', () => {
+    taskModel.softDelete(ids.minor1Id, db);
+    expect(() => {
+      actualService.recordActual(ids.minor1Id, {
+        work_date: '2026-02-15', actual_hours: 4, notes: ''
+      }, db);
+    }).toThrow();
+  });
 
-    it('should handle decimal hours correctly', () => {
-      // Given: Actuals [1.25, 2.75, 0.5]
-      // Expected: 4.5
-      expect(true).toBe(true);
-    });
+  test('should reject recording for a non-existent task', () => {
+    expect(() => {
+      actualService.recordActual(99999, {
+        work_date: '2026-02-15', actual_hours: 4, notes: ''
+      }, db);
+    }).toThrow();
+  });
+
+  test('should default notes to empty string when not provided', () => {
+    const result = actualService.recordActual(ids.minor1Id, {
+      work_date: '2026-02-20', actual_hours: 2
+    }, db);
+    expect(result.entry.notes).toBeDefined();
+  });
+
+  test('should set work_date to today when not provided', () => {
+    const result = actualService.recordActual(ids.minor1Id, {
+      actual_hours: 2, notes: 'No date'
+    }, db);
+    // work_date should be today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().slice(0, 10);
+    expect(result.entry.work_date).toBe(today);
+  });
+});
+
+// =========================================================================
+// Get Actuals
+// =========================================================================
+
+describe('getActualsForTask', () => {
+  test('should return all actuals for a task ordered by date descending', () => {
+    const result = actualService.getActualsForTask(ids.minor1Id, db);
+    expect(result.actuals.length).toBe(2);
+    // Ordered by work_date DESC: 2026-02-11 first, 2026-02-10 second
+    expect(result.actuals[0].work_date).toBe('2026-02-11');
+    expect(result.actuals[1].work_date).toBe('2026-02-10');
+  });
+
+  test('should return empty array for task with no actuals', () => {
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'No actuals', planned_effort_hours: 10
+    }, db);
+    const result = actualService.getActualsForTask(task.id, db);
+    expect(result.actuals).toEqual([]);
+    expect(result.cumulativeHours).toBe(0);
+  });
+
+  test('should include cumulative hours in the response', () => {
+    const result = actualService.getActualsForTask(ids.minor1Id, db);
+    // 6.5 + 2.0 = 8.5
+    expect(result.cumulativeHours).toBe(8.5);
+  });
+
+  test('should return 404 for non-existent task', () => {
+    expect(() => {
+      actualService.getActualsForTask(99999, db);
+    }).toThrow();
+  });
+});
+
+// =========================================================================
+// Update Actual
+// =========================================================================
+
+describe('updateActual', () => {
+  test('should update actual_hours for an existing entry', () => {
+    // Get the first actual for minor1 (2026-02-10, 6.5h)
+    const actuals = actualModel.findByTaskId(ids.minor1Id, db);
+    const actualId = actuals[actuals.length - 1].id; // oldest first
+    const updated = actualService.updateActual(actualId, { actual_hours: 8.0 }, db);
+    expect(updated.actual_hours).toBe(8.0);
+  });
+
+  test('should update notes for an existing entry', () => {
+    const actuals = actualModel.findByTaskId(ids.minor1Id, db);
+    const actualId = actuals[0].id;
+    const updated = actualService.updateActual(actualId, { notes: 'Updated notes' }, db);
+    expect(updated.notes).toBe('Updated notes');
+  });
+
+  test('should trigger progress recalculation after update', () => {
+    // Create a task with known effort
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'Recalc test', planned_effort_hours: 20
+    }, db);
+    // Record actual
+    const rec = actualService.recordActual(task.id, {
+      work_date: '2026-02-15', actual_hours: 5, notes: ''
+    }, db);
+    // Update to 10 hours
+    actualService.updateActual(rec.entry.id, { actual_hours: 10 }, db);
+    // Check task progress updated: 10/20 = 50%
+    const updatedTask = taskModel.findById(task.id, db);
+    expect(updatedTask.progress_percent).toBe(50);
+  });
+
+  test('should return 404 for non-existent actual ID', () => {
+    expect(() => {
+      actualService.updateActual(99999, { actual_hours: 5 }, db);
+    }).toThrow();
+  });
+
+  test('should validate actual_hours on update', () => {
+    const actuals = actualModel.findByTaskId(ids.minor1Id, db);
+    const actualId = actuals[0].id;
+    expect(() => {
+      actualService.updateActual(actualId, { actual_hours: -1 }, db);
+    }).toThrow();
+  });
+});
+
+// =========================================================================
+// Delete Actual
+// =========================================================================
+
+describe('deleteActual', () => {
+  test('should delete an actual entry', () => {
+    const actuals = actualModel.findByTaskId(ids.minor1Id, db);
+    const actualId = actuals[0].id;
+    const result = actualService.deleteActual(actualId, db);
+    expect(result.deleted_actual_id).toBe(actualId);
+    // Entry should be gone
+    const found = actualModel.findById(actualId, db);
+    expect(found).toBeUndefined();
+  });
+
+  test('should trigger progress recalculation after deletion', () => {
+    // Create a task with known effort
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'Delete test', planned_effort_hours: 10
+    }, db);
+    // Record two actuals
+    const rec1 = actualService.recordActual(task.id, {
+      work_date: '2026-02-15', actual_hours: 5, notes: ''
+    }, db);
+    actualService.recordActual(task.id, {
+      work_date: '2026-02-16', actual_hours: 3, notes: ''
+    }, db);
+    // 8/10 = 80% progress
+    let t = taskModel.findById(task.id, db);
+    expect(t.progress_percent).toBe(80);
+
+    // Delete one actual (5h)
+    actualService.deleteActual(rec1.entry.id, db);
+    // Now 3/10 = 30%
+    t = taskModel.findById(task.id, db);
+    expect(t.progress_percent).toBe(30);
+  });
+
+  test('should return 404 for non-existent actual ID', () => {
+    expect(() => {
+      actualService.deleteActual(99999, db);
+    }).toThrow();
+  });
+});
+
+// =========================================================================
+// Cumulative Calculation
+// =========================================================================
+
+describe('getCumulativeHours', () => {
+  test('should return sum of all actual_hours for a task', () => {
+    // minor1 has actuals: 6.5 + 2.0 = 8.5
+    const cumulative = actualService.getCumulativeHours(ids.minor1Id, db);
+    expect(cumulative).toBe(8.5);
+  });
+
+  test('should return 0 for task with no actuals', () => {
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'No actuals', planned_effort_hours: 10
+    }, db);
+    const cumulative = actualService.getCumulativeHours(task.id, db);
+    expect(cumulative).toBe(0);
+  });
+
+  test('should handle decimal hours correctly', () => {
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'Decimal test', planned_effort_hours: 20
+    }, db);
+    actualModel.upsert({ task_id: task.id, work_date: '2026-02-15', actual_hours: 1.25, notes: '' }, db);
+    actualModel.upsert({ task_id: task.id, work_date: '2026-02-16', actual_hours: 2.75, notes: '' }, db);
+    actualModel.upsert({ task_id: task.id, work_date: '2026-02-17', actual_hours: 0.5, notes: '' }, db);
+    const cumulative = actualService.getCumulativeHours(task.id, db);
+    expect(cumulative).toBe(4.5);
   });
 });

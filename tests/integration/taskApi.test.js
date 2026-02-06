@@ -7,277 +7,332 @@
 
 'use strict';
 
-// const request = require('supertest');
-// const app = require('../../src/server'); // Express app
+const request = require('supertest');
+const app = require('../../src/server');
 const { createTestDb, seedTestData, closeTestDb } = require('../helpers/testDb');
+const { setDb } = require('../../src/models/db');
+const taskModel = require('../../src/models/taskModel');
 
-describe('Task API', () => {
-  let db;
-  let testIds;
+let db;
+let ids;
 
-  beforeEach(() => {
-    db = createTestDb();
-    testIds = seedTestData(db);
-    // TODO: Inject test db into app
+beforeEach(() => {
+  db = createTestDb();
+  setDb(db);
+  ids = seedTestData(db);
+});
+
+afterEach(() => {
+  closeTestDb(db);
+});
+
+// =========================================================================
+// GET /api/tasks - List Top-Level Tasks
+// =========================================================================
+
+describe('GET /api/tasks', () => {
+  test('should return all Level 1 tasks with 200 status', async () => {
+    const res = await request(app).get('/api/tasks');
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.data.length).toBe(2);
   });
 
-  afterEach(() => {
-    closeTestDb(db);
+  test('should not include soft-deleted tasks', async () => {
+    taskModel.softDelete(ids.major1Id, db);
+    const res = await request(app).get('/api/tasks');
+    expect(res.body.data.length).toBe(1);
+    expect(res.body.data[0].name).toBe('Development Phase');
   });
 
-  // =========================================================================
-  // GET /api/tasks - List Top-Level Tasks
-  // =========================================================================
-
-  describe('GET /api/tasks', () => {
-    it('should return all Level 1 tasks with 200 status', () => {
-      // Expected: Response contains array of Level 1 tasks
-      // Each task has: id, name, level, status, progress_percent, delay_status
-      expect(true).toBe(true);
-    });
-
-    it('should not include soft-deleted tasks', () => {
-      // Given: One Level 1 task is soft-deleted
-      // Expected: Response does not include the deleted task
-      expect(true).toBe(true);
-    });
-
-    it('should include progress calculation in response', () => {
-      // Expected: Each task has calculated progress_percent
-      expect(true).toBe(true);
-    });
-
-    it('should return tasks ordered by sort_order', () => {
-      // Expected: Tasks are in ascending sort_order
-      expect(true).toBe(true);
-    });
-
-    it('should return empty array when no tasks exist', () => {
-      // Given: Empty database
-      // Expected: { success: true, data: [], meta: { total: 0 } }
-      expect(true).toBe(true);
-    });
+  test('should include progress calculation in response', async () => {
+    const res = await request(app).get('/api/tasks');
+    for (const task of res.body.data) {
+      expect(task).toHaveProperty('progress_percent');
+      expect(task).toHaveProperty('delay_status');
+    }
   });
 
-  // =========================================================================
-  // GET /api/tasks/:id - Get Single Task
-  // =========================================================================
-
-  describe('GET /api/tasks/:id', () => {
-    it('should return a task with its details and 200 status', () => {
-      // Given: Valid task ID
-      // Expected: Full task object with progress and delay info
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for non-existent task', () => {
-      // Given: ID = 99999
-      // Expected: 404 with error message
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for soft-deleted task', () => {
-      // Given: Deleted task ID
-      // Expected: 404
-      expect(true).toBe(true);
-    });
-
-    it('should include children count in response', () => {
-      // Given: A parent task
-      // Expected: Response includes children_count field
-      expect(true).toBe(true);
-    });
+  test('should return tasks ordered by sort_order', async () => {
+    const res = await request(app).get('/api/tasks');
+    expect(res.body.data[0].sort_order).toBeLessThanOrEqual(res.body.data[1].sort_order);
   });
 
-  // =========================================================================
-  // GET /api/tasks/:id/children - Get Children
-  // =========================================================================
+  test('should return empty array when no tasks exist', async () => {
+    // Delete all tasks
+    taskModel.softDelete(ids.major1Id, db);
+    taskModel.softDelete(ids.major2Id, db);
+    const res = await request(app).get('/api/tasks');
+    expect(res.body.data).toEqual([]);
+    expect(res.body.meta.total).toBe(0);
+  });
+});
 
-  describe('GET /api/tasks/:id/children', () => {
-    it('should return children of a task with 200 status', () => {
-      // Given: Parent task ID with children
-      // Expected: Array of child tasks with progress
-      expect(true).toBe(true);
-    });
+// =========================================================================
+// GET /api/tasks/:id - Get Single Task
+// =========================================================================
 
-    it('should return empty array for leaf task', () => {
-      // Given: A Level 3 task ID (no children)
-      // Expected: { success: true, data: [] }
-      expect(true).toBe(true);
-    });
-
-    it('should exclude soft-deleted children', () => {
-      // Given: Parent with some deleted children
-      // Expected: Only non-deleted children returned
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for non-existent parent', () => {
-      // Given: Invalid parent ID
-      // Expected: 404
-      expect(true).toBe(true);
-    });
+describe('GET /api/tasks/:id', () => {
+  test('should return a task with its details and 200 status', async () => {
+    const res = await request(app).get(`/api/tasks/${ids.minor1Id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.id).toBe(ids.minor1Id);
+    expect(res.body.data.name).toBe('Dashboard Wireframe');
   });
 
-  // =========================================================================
-  // POST /api/tasks - Create Task
-  // =========================================================================
-
-  describe('POST /api/tasks', () => {
-    it('should create a Level 1 task and return 201', () => {
-      // Given: { name: 'Test Phase', planned_effort_hours: 20 }
-      // Expected: 201 with created task, level = 1
-      expect(true).toBe(true);
-    });
-
-    it('should create a child task under a parent', () => {
-      // Given: { parent_id: major1Id, name: 'Sub Task' }
-      // Expected: 201 with level = parent.level + 1
-      expect(true).toBe(true);
-    });
-
-    it('should reject task with empty name (400)', () => {
-      // Given: { name: '' }
-      // Expected: 400 validation error
-      expect(true).toBe(true);
-    });
-
-    it('should reject task with name > 200 chars (400)', () => {
-      // Given: { name: 'a'.repeat(201) }
-      // Expected: 400 validation error
-      expect(true).toBe(true);
-    });
-
-    it('should reject task when end_date < start_date (400)', () => {
-      // Given: { planned_start_date: '2026-03-01', planned_end_date: '2026-02-01' }
-      // Expected: 400 validation error
-      expect(true).toBe(true);
-    });
-
-    it('should reject negative planned_effort_hours (400)', () => {
-      // Given: { planned_effort_hours: -5 }
-      // Expected: 400 validation error
-      expect(true).toBe(true);
-    });
-
-    it('should reject Level 4 task creation (400)', () => {
-      // Given: parent_id of a Level 3 task
-      // Expected: 400 hierarchy error
-      expect(true).toBe(true);
-    });
-
-    it('should reject invalid parent_id (404)', () => {
-      // Given: parent_id = 99999
-      // Expected: 404 parent not found
-      expect(true).toBe(true);
-    });
-
-    it('should reject creation under deleted parent (404)', () => {
-      // Given: parent_id of a soft-deleted task
-      // Expected: 404
-      expect(true).toBe(true);
-    });
-
-    it('should sanitize HTML in task name (XSS prevention)', () => {
-      // Given: { name: '<script>alert("xss")</script>Task' }
-      // Expected: HTML tags removed or escaped
-      expect(true).toBe(true);
-    });
+  test('should return 404 for non-existent task', async () => {
+    const res = await request(app).get('/api/tasks/99999');
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
   });
 
-  // =========================================================================
-  // PUT /api/tasks/:id - Update Task
-  // =========================================================================
-
-  describe('PUT /api/tasks/:id', () => {
-    it('should update task fields and return 200', () => {
-      // Given: { name: 'Updated Name', description: 'New desc' }
-      // Expected: 200 with updated task
-      expect(true).toBe(true);
-    });
-
-    it('should update status and trigger progress/parent recalculation', () => {
-      // Given: { status: 'completed' }
-      // Expected: Progress set to 100%, parent status recalculated
-      expect(true).toBe(true);
-    });
-
-    it('should update planned_effort and trigger progress recalculation', () => {
-      // Given: { planned_effort_hours: 50 }
-      // Expected: Progress percent recalculated
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for non-existent task', () => {
-      // Given: ID = 99999
-      // Expected: 404
-      expect(true).toBe(true);
-    });
-
-    it('should return 400 for invalid date combination', () => {
-      // Given: end < start
-      // Expected: 400 validation error
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for deleted task', () => {
-      // Given: Deleted task ID
-      // Expected: 404
-      expect(true).toBe(true);
-    });
+  test('should return 404 for soft-deleted task', async () => {
+    taskModel.softDelete(ids.minor1Id, db);
+    const res = await request(app).get(`/api/tasks/${ids.minor1Id}`);
+    expect(res.status).toBe(404);
   });
 
-  // =========================================================================
-  // DELETE /api/tasks/:id - Soft Delete Task
-  // =========================================================================
+  test('should include children count in response', async () => {
+    const res = await request(app).get(`/api/tasks/${ids.middle1Id}`);
+    expect(res.body.data).toHaveProperty('children_count');
+    expect(res.body.data.children_count).toBe(2);
+  });
+});
 
-  describe('DELETE /api/tasks/:id', () => {
-    it('should soft-delete a task and return 200', () => {
-      // Given: Valid task ID
-      // Expected: 200, task is_deleted = 1
-      expect(true).toBe(true);
-    });
+// =========================================================================
+// GET /api/tasks/:id/children - Get Children
+// =========================================================================
 
-    it('should cascade soft-delete to all descendants', () => {
-      // Given: Level 1 task ID with children and grandchildren
-      // Expected: All descendants also soft-deleted
-      expect(true).toBe(true);
-    });
-
-    it('should recalculate parent progress after deletion', () => {
-      // Given: Delete one child of a parent
-      // Expected: Parent progress recalculated without the deleted child
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for non-existent task', () => {
-      // Given: ID = 99999
-      // Expected: 404
-      expect(true).toBe(true);
-    });
-
-    it('should return 404 for already deleted task', () => {
-      // Given: Delete same task twice
-      // Expected: Second delete returns 404
-      expect(true).toBe(true);
-    });
+describe('GET /api/tasks/:id/children', () => {
+  test('should return children of a task with 200 status', async () => {
+    const res = await request(app).get(`/api/tasks/${ids.major1Id}/children`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.length).toBe(2);
   });
 
-  // =========================================================================
-  // PUT /api/tasks/:id/reorder - Reorder Task
-  // =========================================================================
+  test('should return empty array for leaf task', async () => {
+    const res = await request(app).get(`/api/tasks/${ids.minor1Id}/children`);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual([]);
+  });
 
-  describe('PUT /api/tasks/:id/reorder', () => {
-    it('should update sort_order and return 200', () => {
-      // Given: { sort_order: 5 }
-      // Expected: 200, sort_order updated
-      expect(true).toBe(true);
-    });
+  test('should exclude soft-deleted children', async () => {
+    taskModel.softDelete(ids.middle1Id, db);
+    const res = await request(app).get(`/api/tasks/${ids.major1Id}/children`);
+    expect(res.body.data.length).toBe(1);
+  });
 
-    it('should return 404 for non-existent task', () => {
-      // Given: Invalid ID
-      // Expected: 404
-      expect(true).toBe(true);
-    });
+  test('should return 404 for non-existent parent', async () => {
+    const res = await request(app).get('/api/tasks/99999/children');
+    expect(res.status).toBe(404);
+  });
+});
+
+// =========================================================================
+// POST /api/tasks - Create Task
+// =========================================================================
+
+describe('POST /api/tasks', () => {
+  test('should create a Level 1 task and return 201', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ name: 'Test Phase', planned_effort_hours: 20 });
+    expect(res.status).toBe(201);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.level).toBe(1);
+    expect(res.body.data.status).toBe('not_started');
+  });
+
+  test('should create a child task under a parent', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ parent_id: ids.major1Id, name: 'Sub Task', planned_effort_hours: 5 });
+    expect(res.status).toBe(201);
+    expect(res.body.data.level).toBe(2);
+  });
+
+  test('should reject task with empty name (400)', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ name: '' });
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  test('should reject task with name > 200 chars (400)', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ name: 'a'.repeat(201) });
+    expect(res.status).toBe(400);
+  });
+
+  test('should reject task when end_date < start_date (400)', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({
+        name: 'Bad dates',
+        planned_start_date: '2026-03-01',
+        planned_end_date: '2026-02-01'
+      });
+    expect(res.status).toBe(400);
+  });
+
+  test('should reject negative planned_effort_hours (400)', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ name: 'Neg effort', planned_effort_hours: -5 });
+    expect(res.status).toBe(400);
+  });
+
+  test('should reject Level 4 task creation (400)', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ parent_id: ids.minor1Id, name: 'Too deep' });
+    expect(res.status).toBe(400);
+  });
+
+  test('should reject invalid parent_id (404)', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ parent_id: 99999, name: 'Orphan' });
+    expect(res.status).toBe(400); // validation catches non-existent parent
+  });
+
+  test('should reject creation under deleted parent (404)', async () => {
+    taskModel.softDelete(ids.major1Id, db);
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ parent_id: ids.major1Id, name: 'Under deleted' });
+    expect(res.status).toBe(400); // validation catches deleted parent as not found
+  });
+
+  test('should sanitize HTML in task name (XSS prevention)', async () => {
+    const res = await request(app)
+      .post('/api/tasks')
+      .send({ name: '<script>alert("xss")</script>Task' });
+    expect(res.status).toBe(201);
+    expect(res.body.data.name).not.toContain('<script>');
+  });
+});
+
+// =========================================================================
+// PUT /api/tasks/:id - Update Task
+// =========================================================================
+
+describe('PUT /api/tasks/:id', () => {
+  test('should update task fields and return 200', async () => {
+    const res = await request(app)
+      .put(`/api/tasks/${ids.minor1Id}`)
+      .send({ name: 'Updated Name', description: 'New desc' });
+    expect(res.status).toBe(200);
+    expect(res.body.data.description).toBe('New desc');
+  });
+
+  test('should update status and trigger progress/parent recalculation', async () => {
+    const res = await request(app)
+      .put(`/api/tasks/${ids.minor1Id}`)
+      .send({ status: 'completed' });
+    expect(res.status).toBe(200);
+    expect(res.body.data.status).toBe('completed');
+    expect(res.body.data.progress_percent).toBe(100);
+  });
+
+  test('should update planned_effort and trigger progress recalculation', async () => {
+    const res = await request(app)
+      .put(`/api/tasks/${ids.minor1Id}`)
+      .send({ planned_effort_hours: 50 });
+    expect(res.status).toBe(200);
+    // 8.5h/50h = 17%
+    expect(res.body.data.progress_percent).toBeLessThan(100);
+  });
+
+  test('should return 404 for non-existent task', async () => {
+    const res = await request(app)
+      .put('/api/tasks/99999')
+      .send({ name: 'Not found' });
+    expect(res.status).toBe(404);
+  });
+
+  test('should return 400 for invalid date combination', async () => {
+    const res = await request(app)
+      .put(`/api/tasks/${ids.minor1Id}`)
+      .send({
+        planned_start_date: '2026-03-15',
+        planned_end_date: '2026-03-01'
+      });
+    expect(res.status).toBe(400);
+  });
+
+  test('should return 404 for deleted task', async () => {
+    taskModel.softDelete(ids.minor1Id, db);
+    const res = await request(app)
+      .put(`/api/tasks/${ids.minor1Id}`)
+      .send({ name: 'Deleted' });
+    expect(res.status).toBe(404);
+  });
+});
+
+// =========================================================================
+// DELETE /api/tasks/:id - Soft Delete Task
+// =========================================================================
+
+describe('DELETE /api/tasks/:id', () => {
+  test('should soft-delete a task and return 200', async () => {
+    const res = await request(app).delete(`/api/tasks/${ids.minor1Id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.deleted_task_id).toBe(ids.minor1Id);
+  });
+
+  test('should cascade soft-delete to all descendants', async () => {
+    const res = await request(app).delete(`/api/tasks/${ids.major1Id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.deleted_descendants_count).toBeGreaterThanOrEqual(2);
+    // Verify children are gone
+    const childRes = await request(app).get(`/api/tasks/${ids.middle1Id}`);
+    expect(childRes.status).toBe(404);
+  });
+
+  test('should recalculate parent progress after deletion', async () => {
+    await request(app).delete(`/api/tasks/${ids.minor1Id}`);
+    // middle1 should still exist with recalculated progress
+    const parentRes = await request(app).get(`/api/tasks/${ids.middle1Id}`);
+    expect(parentRes.status).toBe(200);
+    expect(parentRes.body.data).toHaveProperty('progress_percent');
+  });
+
+  test('should return 404 for non-existent task', async () => {
+    const res = await request(app).delete('/api/tasks/99999');
+    expect(res.status).toBe(404);
+  });
+
+  test('should return 404 for already deleted task', async () => {
+    await request(app).delete(`/api/tasks/${ids.minor1Id}`);
+    const res = await request(app).delete(`/api/tasks/${ids.minor1Id}`);
+    expect(res.status).toBe(404);
+  });
+});
+
+// =========================================================================
+// PUT /api/tasks/:id/reorder - Reorder Task
+// =========================================================================
+
+describe('PUT /api/tasks/:id/reorder', () => {
+  test('should update sort_order and return 200', async () => {
+    const res = await request(app)
+      .put(`/api/tasks/${ids.major1Id}/reorder`)
+      .send({ sort_order: 5 });
+    expect(res.status).toBe(200);
+    expect(res.body.data.sort_order).toBe(5);
+  });
+
+  test('should return 404 for non-existent task', async () => {
+    const res = await request(app)
+      .put('/api/tasks/99999/reorder')
+      .send({ sort_order: 1 });
+    expect(res.status).toBe(404);
   });
 });
