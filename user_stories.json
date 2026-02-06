@@ -1,0 +1,209 @@
+{
+  "version": "1.0",
+  "project": "Budget Tracker - WBS Task & Progress Manager",
+  "stories": [
+    {
+      "id": "US-01",
+      "title": "Create hierarchical tasks",
+      "description": "As a project manager, I want to create tasks organized into 3 hierarchical levels (major > middle > minor) so that I can represent a WBS structure.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Can create a Level 1 (major) task with name, description, dates, and effort",
+        "Can create a Level 2 (middle) task under a Level 1 parent",
+        "Can create a Level 3 (minor) task under a Level 2 parent",
+        "Cannot create a Level 4 task (rejected with error)",
+        "Each task has auto-assigned level based on parent",
+        "New tasks have status 'not_started' and progress 0%"
+      ],
+      "functional_requirements": ["FR-01", "FR-02", "FR-18"],
+      "test_cases": ["TC-TASK-001", "TC-TASK-002", "TC-TASK-003"]
+    },
+    {
+      "id": "US-02",
+      "title": "Input planned schedules",
+      "description": "As a user, I want to input planned start/end dates and planned effort (hours) for each task so that I can set baseline schedules.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Can set planned_start_date and planned_end_date in YYYY-MM-DD format",
+        "Can set planned_effort_hours as a positive number",
+        "End date validation: must be >= start date",
+        "Effort validation: must be >= 0",
+        "Inline editing: click on date/effort field to edit directly",
+        "Auto-save on blur or Enter key"
+      ],
+      "functional_requirements": ["FR-05", "FR-06", "FR-07"],
+      "test_cases": ["TC-SCHED-001", "TC-SCHED-002"]
+    },
+    {
+      "id": "US-03",
+      "title": "Record daily actuals",
+      "description": "As a user, I want to record daily actual effort/progress for each task so that I can track real performance against plans.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Can record actual hours for a specific date on any task",
+        "Can add optional notes to the daily record",
+        "One entry per task per day (upsert: second entry updates the first)",
+        "Actual hours must be > 0 and <= 24",
+        "Work date defaults to today",
+        "Cannot record for dates more than 1 day in the future",
+        "Recording an actual triggers progress recalculation"
+      ],
+      "functional_requirements": ["FR-08", "FR-09"],
+      "test_cases": ["TC-ACTUAL-001", "TC-ACTUAL-002", "TC-ACTUAL-003"]
+    },
+    {
+      "id": "US-04",
+      "title": "View automatic progress calculation",
+      "description": "As a user, I want to see automatic progress rate calculation (%) for each task and its parent items so that I know how far along we are.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Leaf task progress = (cumulative actual hours / planned effort) * 100, capped at 100%",
+        "Parent progress = weighted average of children (by planned effort)",
+        "If planned effort is 0: progress is 0% unless status is completed (100%)",
+        "If children have no planned effort: equal-weight average",
+        "Progress bar is displayed on every task row",
+        "Progress percentage is shown as number next to the bar"
+      ],
+      "functional_requirements": ["FR-11", "FR-13", "FR-17"],
+      "test_cases": ["TC-PROG-001", "TC-PROG-002", "TC-PROG-003", "TC-PROG-004"]
+    },
+    {
+      "id": "US-05",
+      "title": "View delay indicators",
+      "description": "As a user, I want to see delay rate indicators so that I can identify tasks that are behind schedule.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Tasks past due date with < 100% progress show 'OVERDUE' (red)",
+        "Tasks with > 80% duration elapsed and < 60% progress show 'AT RISK' (yellow)",
+        "Tasks on track show 'ON TRACK' (green)",
+        "Tasks without dates show no delay indicator",
+        "Delay status is recalculated on each page load"
+      ],
+      "functional_requirements": ["FR-12", "FR-14"],
+      "test_cases": ["TC-DELAY-001", "TC-DELAY-002", "TC-DELAY-003"]
+    },
+    {
+      "id": "US-06",
+      "title": "Visual delay warnings",
+      "description": "As a user, I want delayed tasks to display visual warnings (red/yellow indicators) so that I can take corrective action quickly.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Yellow badge with warning icon for 'at_risk' tasks",
+        "Red badge with alert icon for 'overdue' tasks",
+        "Badges are visible on task list rows",
+        "Dashboard shows count and list of delayed tasks"
+      ],
+      "functional_requirements": ["FR-14", "FR-16"],
+      "test_cases": ["TC-WARN-001", "TC-WARN-002"]
+    },
+    {
+      "id": "US-07",
+      "title": "Gray-out completed tasks",
+      "description": "As a user, I want completed tasks to appear grayed out so that I can visually distinguish completed work from active work at a glance.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Completed tasks have reduced opacity (0.55)",
+        "Task name has strikethrough decoration",
+        "Status badge shows green 'Done' indicator",
+        "Completed tasks are still visible (not hidden) in the list",
+        "Completed tasks can still be clicked for drill-down"
+      ],
+      "functional_requirements": ["FR-15"],
+      "test_cases": ["TC-VIS-001"]
+    },
+    {
+      "id": "US-08",
+      "title": "Edit and delete tasks",
+      "description": "As a user, I want to edit, update, and delete tasks and their schedules after creation so that I can correct mistakes and adapt to changes.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Can edit any task property (name, description, dates, effort, status)",
+        "Inline editing for dates and effort fields",
+        "Modal editing for full task details",
+        "Delete shows confirmation dialog",
+        "Deleting a parent task deletes all children (cascade)",
+        "Soft delete: data is preserved with is_deleted flag",
+        "After delete, parent progress is recalculated"
+      ],
+      "functional_requirements": ["FR-18", "FR-19", "FR-20", "FR-21", "FR-03", "FR-04"],
+      "test_cases": ["TC-EDIT-001", "TC-DEL-001", "TC-DEL-002"]
+    },
+    {
+      "id": "US-09",
+      "title": "Drill-down navigation",
+      "description": "As a user, I want the top page to show all major items, and clicking one drills down to its children so that navigation follows the WBS hierarchy.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Top page shows all Level 1 tasks with summary progress",
+        "Clicking a Level 1 task shows its Level 2 children",
+        "Clicking a Level 2 task shows its Level 3 children",
+        "Breadcrumb shows full path: Home > Major > Middle",
+        "Clicking any breadcrumb segment navigates to that level",
+        "Browser back button navigates correctly"
+      ],
+      "functional_requirements": ["FR-22", "FR-23", "FR-24"],
+      "test_cases": ["TC-NAV-001", "TC-NAV-002", "TC-NAV-003"]
+    },
+    {
+      "id": "US-10",
+      "title": "LAN access",
+      "description": "As a team member on the same LAN, I want to view the project status from my own computer so that I stay informed without needing the host machine.",
+      "priority": "P0",
+      "acceptance_criteria": [
+        "Server listens on 0.0.0.0 for LAN access",
+        "On startup, local IP address and port are displayed",
+        "Other devices on the same LAN can access the app via IP:port",
+        "CORS is configured to allow LAN origins",
+        "Full read/write access from LAN (no authentication)"
+      ],
+      "functional_requirements": ["FR-25", "FR-26"],
+      "test_cases": ["TC-LAN-001"]
+    },
+    {
+      "id": "US-11",
+      "title": "Dashboard overview",
+      "description": "As a user, I want a dashboard page showing overall project progress summary so that I get a quick snapshot.",
+      "priority": "P1",
+      "acceptance_criteria": [
+        "Shows total tasks count",
+        "Shows completed / in-progress / not-started counts",
+        "Shows overall progress percentage with progress bar",
+        "Shows count and list of delayed tasks",
+        "Shows summary of all Level 1 tasks with mini progress bars",
+        "Auto-refreshes data on page load"
+      ],
+      "functional_requirements": ["FR-27"],
+      "test_cases": ["TC-DASH-001", "TC-DASH-002"]
+    },
+    {
+      "id": "US-12",
+      "title": "Search and filter tasks",
+      "description": "As a user, I want to filter and search tasks by name, status, or date range so that I can find specific items quickly.",
+      "priority": "P1",
+      "acceptance_criteria": [
+        "Text search filters tasks by name (case-insensitive)",
+        "Status dropdown filters by not_started / in_progress / completed",
+        "Filters work within the current drill-down level",
+        "Filters are combinable (AND logic)",
+        "Clearing search shows all tasks",
+        "Filtering is instant (client-side)"
+      ],
+      "functional_requirements": ["FR-28"],
+      "test_cases": ["TC-SEARCH-001", "TC-SEARCH-002"]
+    },
+    {
+      "id": "US-13",
+      "title": "Color-coded date indicators",
+      "description": "As a user, I want color-coded due date indicators so that urgency is immediately visible.",
+      "priority": "P1",
+      "acceptance_criteria": [
+        "Green: On track (within schedule)",
+        "Yellow: At risk (behind expected progress)",
+        "Red: Overdue (past due date with incomplete progress)",
+        "No color: No dates set or task not started"
+      ],
+      "functional_requirements": ["FR-29"],
+      "test_cases": ["TC-COLOR-001"]
+    }
+  ]
+}
