@@ -47,11 +47,11 @@ app.use(compression());
 
 // Response time tracking (set header before response is sent)
 app.use((req, res, next) => {
-  req._startTime = process.hrtime.bigint();
+  const startMs = Date.now();
   const originalJson = res.json.bind(res);
   res.json = function(body) {
-    const elapsed = Number(process.hrtime.bigint() - req._startTime) / 1e6;
-    res.set('X-Response-Time', `${elapsed.toFixed(2)}ms`);
+    const elapsed = Date.now() - startMs;
+    res.set('X-Response-Time', `${elapsed}ms`);
     return originalJson(body);
   };
   next();
@@ -71,8 +71,12 @@ app.use(express.json({ limit: '256kb' }));
 // Enable ETag for API responses (weak ETags for JSON)
 app.set('etag', 'weak');
 
-// Static files (SPA frontend) with optimized caching
-app.use(express.static(path.join(__dirname, '..', 'public'), {
+// Static files: serve React build from frontend/dist/ (fallback to public/ for legacy)
+const frontendDist = path.join(__dirname, '..', 'frontend', 'dist');
+const publicDir = path.join(__dirname, '..', 'public');
+const fs = require('fs');
+const staticDir = fs.existsSync(frontendDist) ? frontendDist : publicDir;
+app.use(express.static(staticDir, {
   maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
   etag: true,
   lastModified: true,
@@ -96,7 +100,7 @@ app.get('*', (req, res) => {
       error: { code: 'NOT_FOUND', message: 'API endpoint not found' }
     });
   }
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  res.sendFile(path.join(staticDir, 'index.html'));
 });
 
 // Error handler
