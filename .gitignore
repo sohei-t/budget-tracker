@@ -50,8 +50,22 @@ tmp/
 temp/
 tmp_test_db_*/
 
-# Project-specific generated files (should be generated per project)
+# Database files
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Development artifacts
+worktrees/
+EVALUATION_REPORT*.json
+PHASE*_COMPLETION_REPORT.md
+README_TEMPLATE.md
+publish_to_portfolio.sh
+release.sh
+launch_app.command
+project/
+
+# Project-specific generated files
 AUDIO_PROMPTS.json
 IMAGE_PROMPTS.json
-# GCP credentials (auto-generated)
 credentials/*.json
