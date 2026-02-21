@@ -28,6 +28,9 @@
     "testMatch": [
       "**/tests/**/*.test.js"
     ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/worktrees/"
+    ],
     "collectCoverageFrom": [
       "src/**/*.js",
       "!src/server.js",

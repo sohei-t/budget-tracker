@@ -59,7 +59,7 @@ function renderDashboard() {
   }
 
   const { total_tasks, completed_tasks, in_progress_tasks, not_started_tasks,
-    overall_progress_percent_percent, overdue_count, at_risk_count, major_items } = dashboard;
+    overall_progress_percent, overdue_count, at_risk_count, major_items } = dashboard;
 
   const delayItems = (delayedTasks || []).map(task => {
     const isRisk = task.delay_status === 'at_risk';

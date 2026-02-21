@@ -1,230 +1,323 @@
-# 🤖 AI Multi-Agent System Template v4.0
+# Budget Tracker
 
-**プロジェクトマネージャー完全自動化**を実現する動的タスクオーケストレーションシステム
+WBS（Work Breakdown Structure）形式のタスク・進捗管理Webアプリケーション。大項目・中項目・小項目の3階層でタスクを管理し、予定と実績を記録することで進捗を可視化します。
 
-## ✨ 特徴
+## 概要
 
-- **動的タスクオーケストレーション**: WBSベースの依存関係自動解析 🆕
-- **クリティカルパス分析**: 最短実行経路の自動特定 🆕
-- **リアルタイムガントチャート**: 進捗の可視化と監視 🆕
-- **TDD（テスト駆動開発）**: テストコードを先に作成してから実装
-- **ドキュメント自動生成**: README、API仕様書、設計図を自動作成
-- **要件定義エージェント**: ユーザー要望を明確化
-- **並列開発**: 複数エージェントが同時作業（依存関係考慮）
-- **自己検証**: 各エージェントが動作確認まで実施
-- **Git Worktree**: 独立した作業環境で並列処理
-- **業界標準準拠**: CrewAI, AutoGen, LangGraphのベストプラクティス採用
+Budget Trackerは、プロジェクト管理に最適なWBSライクなタスク管理ツールです。予定工数と実績工数を管理し、進捗率や遅延率を自動計算します。ダークモード対応、キーボードショートカット、高速検索機能を備えた、モダンなSPA（Single Page Application）です。
 
-## 🚀 クイックスタート
+## 主な機能
 
-### 1. テンプレートをコピー
+### タスク管理
+- **3階層タスク構造**: 大項目 → 中項目 → 小項目のツリー構造
+- **予定管理**: 開始日・終了日・予定工数（時間）を設定
+- **実績記録**: 作業時間を記録し、自動的に進捗率を計算
+- **進捗可視化**: プログレスバーで進捗を直感的に把握
+- **遅延検知**: 遅れているタスクを自動的に警告表示
+
+### UI/UX
+- **ダークモード**: システム設定に自動追従、手動切り替えも可能
+- **レスポンシブデザイン**: モバイル・タブレット・デスクトップに対応
+- **キーボードショートカット**:
+  - `G + D`: Dashboard表示
+  - `G + T`: Tasks表示
+  - `N`: 新規タスク作成
+  - `Ctrl + K`: 検索
+  - `Ctrl + D`: ダークモード切り替え
+  - `?`: ショートカット一覧表示
+- **高速検索**: インクリメンタルサーチでタスクを即座に検索
+
+### パフォーマンス
+- **高速起動**: SQLite WALモード、最適化されたクエリ
+- **効率的なレンダリング**: イベント委譲、仮想DOM不使用のバニラJS
+- **LAN内アクセス**: 同じネットワーク内のデバイスからアクセス可能
+
+## 技術スタック
+
+### バックエンド
+- **Node.js** 18+ LTS
+- **Express** 4.x - Webフレームワーク
+- **better-sqlite3** - SQLiteドライバ（WALモード有効化）
+- **Helmet** - セキュリティヘッダー
+- **CORS** - クロスオリジン対応
+- **Compression** - gzip圧縮
+
+### フロントエンド
+- **Vanilla JavaScript** (ES2020+) - フレームワークレス
+- **Custom CSS Variables** - テーマ切り替え
+- **Hash-based Routing** - SPAルーティング
+- **LocalStorage** - クライアント側状態管理
+
+### テスト
+- **Jest** 29.x - テストフレームワーク
+- **Supertest** 6.x - API統合テスト
+- **カバレッジ**: 97.92% (270件のテスト、100%合格)
+
+### セキュリティ
+- **Helmet**: セキュリティヘッダー設定
+- **CORS**: クロスオリジン制御
+- **XSS対策**: 入力サニタイゼーション
+- **CSRF対策**: トークン検証（計画中）
+
+## セットアップ
+
+### 必要な環境
+- Node.js 18.0.0以上
+- npm 8.0.0以上
+
+### インストール
+
 ```bash
-cp -r git-worktree-agent my-project
-cd my-project
+# リポジトリをクローン
+git clone https://github.com/yourusername/budget-tracker.git
+cd budget-tracker
+
+# 依存関係をインストール
+npm install
+
+# サーバーを起動
+npm start
 ```
 
-### 2. 初期化
+サーバーが起動したら、ブラウザで以下にアクセス:
+- **ローカル**: http://localhost:3000
+- **LAN内**: http://<your-ip>:3000
+
+### 開発モード
+
 ```bash
-git init
-git add .
-git commit -m "Initial commit: Project setup with agent system v2.1"
+# 自動リロード付きで起動
+npm run dev
 ```
 
-### 3. Claude Codeを起動して依頼
+## 使い方
+
+### 初回起動
+1. サーバーを起動 (`npm start`)
+2. ブラウザで http://localhost:3000 にアクセス
+3. Dashboard画面が表示されます
+
+### タスクの作成
+1. 「Tasks」ページへ移動
+2. 「New Task」ボタンをクリック（またはキーボードで `N` を押す）
+3. タスク情報を入力:
+   - **名前**: タスクの名称
+   - **階層**: 大項目・中項目・小項目
+   - **親タスク**: 中項目・小項目の場合は親を選択
+   - **予定**: 開始日・終了日・予定工数（時間）
+4. 「Create」ボタンで保存
+
+### 実績の記録
+1. タスク行をクリックして詳細を表示
+2. 「Record Work」ボタンをクリック
+3. 作業時間（時間）と日付を入力
+4. 「Save」で記録
+
+### 進捗の確認
+- **Dashboard**: 全体の進捗サマリーを表示
+- **Tasks**: 各タスクの詳細な進捗を表示
+- **プログレスバー**: 各タスク行に進捗率を表示
+- **遅延警告**: 遅れているタスクは赤く表示
+
+## テスト実行
+
+### 全テストを実行
 ```bash
-# Claude Codeでプロジェクトフォルダを開く
-# 例: "TODOアプリを作って"と依頼
+npm test
 ```
 
-## 📂 ファイル構成
-
-```
-.
-├── 📋 設定ファイル
-│   ├── agent_config.yaml        # エージェント定義（v4.0対応）
-│   ├── agent_library.yaml       # 業界標準エージェントライブラリ
-│   ├── WBS_TEMPLATE.json        # タスク依存関係テンプレート 🆕
-│   └── CLAUDE.md                # AI用ガイドライン
-│
-├── 🔧 実行スクリプト
-│   ├── launch_agents.sh         # エージェント起動スクリプト
-│   ├── dynamic_task_orchestrator.py # 動的実行エンジン 🆕
-│   └── quick_start.sh           # 対話型セットアップ
-│
-├── 📊 可視化ツール
-│   └── gantt_visualizer.html    # リアルタイムガントチャート 🆕
-│
-├── 📚 ドキュメント
-│   ├── AGENT_TEST_CHECKLIST.md  # 動作検証チェックリスト
-│   ├── BRANCH_LIFECYCLE.md      # ブランチ管理ガイド
-│   ├── WORKFLOW_V2.md           # ワークフロー詳細（v2）
-│   ├── WORKFLOW_V3_TDD.md       # TDDワークフロー（v3）
-│   └── WORKFLOW_V4_DYNAMIC.md   # 動的オーケストレーション（v4） 🆕
-│
-├── 🎯 サンプルアプリ
-│   └── example-apps/
-│       ├── stock-tracker/       # 株価表示アプリ（デモ）
-│       └── todo-app/            # TODOアプリ（デモ）
-│
-└── 📁 作業ディレクトリ
-    └── worktrees/               # エージェント作業場所（自動生成）
-
-```
-
-## 🔄 ワークフロー
-
-### v4.0 動的オーケストレーション 🆕
-
-```mermaid
-graph TD
-    A[要件定義] --> B[WBS生成]
-    B --> C[依存関係解析]
-    C --> D[クリティカルパス特定]
-    D --> E[動的タスク実行]
-    E --> F{並列可能?}
-    F -->|Yes| G[並列実行]
-    F -->|No| H[順次実行]
-    G --> I[進捗監視]
-    H --> I
-    I --> J{完了?}
-    J -->|No| E
-    J -->|Yes| K[統合・レビュー]
-```
-
-### バージョン比較
-
-| 機能 | v2.1 | v3.0 (TDD) | v4.0 (Dynamic) |
-|------|------|------------|----------------|
-| 並列実行 | ✅ 単純並列 | ✅ 単純並列 | ✅ 依存関係考慮 |
-| タスク順序 | 固定 | 固定 | 動的決定 |
-| テスト優先 | ❌ | ✅ TDD | ✅ TDD |
-| 進捗可視化 | ❌ | ❌ | ✅ ガントチャート |
-| PM自動化 | ❌ | ❌ | ✅ 完全自動 |
-
-## 🎯 使用例
-
-### Webアプリ開発
+### カバレッジレポート付きで実行
 ```bash
-./launch_agents.sh webapp "ECサイトの商品検索機能"
+npm run test:coverage
 ```
 
-### API開発
+### ウォッチモード（開発中）
 ```bash
-./launch_agents.sh api "REST APIの認証システム"
+npm run test:watch
 ```
 
-### デバッグ
-```bash
-./launch_agents.sh debug "ログインエラーを修正"
+### テスト結果
+- **総テスト数**: 270件
+- **合格率**: 100%
+- **カバレッジ**: 97.92%
+  - Statements: 97.92%
+  - Branches: 94.05%
+  - Functions: 100%
+  - Lines: 97.92%
+
+## ディレクトリ構造
+
+```
+budget-tracker/
+├── public/                 # フロントエンド（静的ファイル）
+│   ├── index.html          # エントリーポイント
+│   ├── css/
+│   │   └── main.css        # スタイルシート（CSS Variables使用）
+│   └── js/
+│       ├── app.js          # アプリケーション初期化
+│       ├── router.js       # ハッシュベースルーティング
+│       ├── store.js        # 状態管理
+│       ├── api.js          # APIクライアント
+│       ├── components/     # UIコンポーネント
+│       │   ├── dashboard.js
+│       │   ├── taskList.js
+│       │   ├── taskDetail.js
+│       │   ├── taskForm.js
+│       │   ├── actualForm.js
+│       │   ├── progressBar.js
+│       │   ├── modal.js
+│       │   └── toast.js
+│       └── utils/          # ユーティリティ
+│           ├── dom.js
+│           ├── dates.js
+│           └── shortcuts.js
+├── src/                    # バックエンド（Node.js + Express）
+│   ├── server.js           # サーバーエントリーポイント
+│   ├── models/             # データモデル（SQLite）
+│   │   ├── task.js
+│   │   ├── actual.js
+│   │   └── db.js
+│   ├── services/           # ビジネスロジック
+│   │   ├── taskService.js
+│   │   └── actualService.js
+│   ├── controllers/        # リクエストハンドラー
+│   │   ├── taskController.js
+│   │   └── actualController.js
+│   ├── routes/             # ルート定義
+│   │   ├── tasks.js
+│   │   └── actuals.js
+│   ├── middleware/         # ミドルウェア
+│   │   ├── errorHandler.js
+│   │   └── validator.js
+│   └── utils/              # ユーティリティ
+│       └── logger.js
+├── tests/                  # テストコード（Jest）
+│   ├── models/
+│   ├── services/
+│   ├── controllers/
+│   └── integration/
+├── data/                   # データベースファイル
+│   └── budget-tracker.db   # SQLiteデータベース
+├── package.json            # npm設定
+└── README.md               # このファイル
 ```
 
-## 🤖 利用可能なエージェント
+## API仕様
 
-### オーケストレーター（v4.0新規）
-- `project_manager` - プロジェクトマネージャー 🆕
-  - WBS解析と実行計画策定
-  - 依存関係とクリティカルパス分析
-  - リソース最適化と進捗管理
+### タスクAPI
 
-### 計画・設計エージェント
-- `requirements_analyst` - 要件定義アナリスト
-- `planner` - プロジェクトプランナー（v4.0: WBS JSON出力対応）
-- `architect` - ソリューションアーキテクト
-- `test_designer` - テスト設計エンジニア（TDD用）
+#### GET /api/tasks
+すべてのタスクを取得
 
-### 開発エージェント
-- `frontend_dev` - フロントエンド開発者
-- `backend_dev` - バックエンド開発者
-- `db_expert` - データベースアーキテクト
-- `devops` - DevOpsエンジニア
-
-### 品質保証エージェント
-- `tester` - QAエンジニア（拡張版）
-- `documenter` - テクニカルライター
-- `reviewer` - 統合レビューア
-
-### 業界標準エージェント（agent_library.yaml）
-- CrewAI形式のエージェント
-- AutoGen形式のエージェント
-- LangGraph形式のエージェント
-
-## 📊 品質メトリクス
-
-### v4.0 動的オーケストレーションの実績
-
-| 指標 | v2.1 | v3.0 | v4.0 | 改善率 |
-|------|------|------|------|--------|
-| エラー修正時間 | 基準 | -20% | -66% | 3.3倍高速 |
-| マージ成功率 | 70% | 85% | 95% | 36%向上 |
-| タスク実行効率 | 40% | 60% | 85% | 2.1倍向上 |
-| 並列処理活用 | 30% | 40% | 75% | 2.5倍向上 |
-| プロジェクト完了 | 基準 | -15% | -35% | 35%短縮 |
-
-## 🛠️ カスタマイズ
-
-### エージェント追加
-`agent_config.yaml`に新しいエージェントを定義：
-
-```yaml
-agents:
-  my_agent:
-    name: "カスタムエージェント"
-    description: "特定タスク用"
-    prompt: |
-      あなたは...
-    skills: ["skill1", "skill2"]
+**レスポンス**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "開発フェーズ",
+      "level": "large",
+      "parent_id": null,
+      "planned_start": "2024-01-01",
+      "planned_end": "2024-03-31",
+      "planned_hours": 480,
+      "actual_hours": 120,
+      "progress_rate": 25,
+      "is_delayed": false
+    }
+  ]
+}
 ```
 
-### ワークフロー追加
-`launch_agents.sh`にカスタムワークフローを追加可能
+#### GET /api/tasks/:id
+特定のタスクを取得
 
-## 📝 ベストプラクティス
+#### POST /api/tasks
+新規タスクを作成
 
-1. **要件定義を明確に**: 最初の対話でタスクを明確化
-2. **テスト完了まで保持**: ブランチは早期削除しない
-3. **チェックリスト活用**: AGENT_TEST_CHECKLIST.mdを参照
-4. **並列処理を活用**: 独立したタスクは同時実行
-
-## 🔗 関連情報
-
-- [Git Worktree Documentation](https://git-scm.com/docs/git-worktree)
-- [Claude Code Documentation](https://claude.com/claude-code)
-- CrewAI, AutoGen, LangGraph各フレームワーク
-
-## 📄 ライセンス
-
-MIT License - 自由に使用・改変可能
-
-## 🙏 謝辞
-
-このシステムは2024年の主要AIエージェントフレームワーク（CrewAI、AutoGen、LangGraph）のベストプラクティスを参考にしています。
-
-## 🚀 v4.0の新機能
-
-### 動的タスクオーケストレーション
-```bash
-# WBSベースの自動実行
-python dynamic_task_orchestrator.py
-
-# リアルタイム監視
-open gantt_visualizer.html
+**リクエストボディ**:
+```json
+{
+  "name": "タスク名",
+  "level": "large|medium|small",
+  "parent_id": 1,
+  "planned_start": "2024-01-01",
+  "planned_end": "2024-01-31",
+  "planned_hours": 40
+}
 ```
 
-### プロジェクトマネージャーエージェント
-```bash
-# Claude Codeで依頼
-"プロジェクトマネージャーエージェントでECサイトを構築して"
+#### PUT /api/tasks/:id
+タスクを更新
 
-# 自動的に以下を実行:
-# 1. 要件分析とWBS生成
-# 2. 依存関係解析
-# 3. クリティカルパス特定
-# 4. 最適な並列実行
-# 5. 進捗監視とレポート
+#### DELETE /api/tasks/:id
+タスクを削除
+
+### 実績API
+
+#### GET /api/actuals
+すべての実績を取得
+
+#### POST /api/actuals
+実績を記録
+
+**リクエストボディ**:
+```json
+{
+  "task_id": 1,
+  "work_date": "2024-01-15",
+  "hours": 8,
+  "description": "作業内容"
+}
 ```
+
+#### PUT /api/actuals/:id
+実績を更新
+
+#### DELETE /api/actuals/:id
+実績を削除
+
+## パフォーマンス最適化
+
+- **SQLite WALモード**: 読み書き並行処理の高速化
+- **PRAGMA最適化**: journal_mode, synchronous, cache_size, temp_store
+- **N+1クエリ削減**: 親子関係をJOINで一度に取得
+- **イベント委譲**: DOMイベントリスナーを最小化
+- **Compression**: gzip圧縮でレスポンスサイズを削減
+
+## セキュリティ対策
+
+- **Helmet**: セキュリティヘッダー（XSS、Clickjacking対策）
+- **CORS**: 許可されたオリジンのみアクセス可能
+- **入力検証**: すべての入力をバリデーション
+- **SQLインジェクション対策**: プリペアドステートメント使用
+- **XSS対策**: HTML特殊文字のエスケープ
+
+## ライセンス
+
+MIT License
+
+Copyright (c) 2024 Budget Tracker Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ---
 
-**Version**: 4.0
-**Last Updated**: 2024-12-03
-**Status**: Production Ready - Project Manager Automation 🚀
+**Generated with [Claude Code](https://claude.com/claude-code)**

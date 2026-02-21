@@ -142,8 +142,13 @@ describe('POST /api/tasks/:id/actuals', () => {
   });
 
   test('should default work_date to today when not provided', async () => {
+    // Use a fresh task to avoid collision with seed data actuals on today's date
+    const task = taskModel.create({
+      parent_id: ids.middle2Id, level: 3,
+      name: 'Date default test', planned_effort_hours: 10
+    }, db);
     const res = await request(app)
-      .post(`/api/tasks/${ids.minor1Id}/actuals`)
+      .post(`/api/tasks/${task.id}/actuals`)
       .send({ actual_hours: 2, notes: 'No date' });
     expect(res.status).toBe(201);
     const today = new Date().toISOString().slice(0, 10);
