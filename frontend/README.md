@@ -1,4 +1,11 @@
-# React + TypeScript + Vite
+# Budget Tracker Frontend
+
+[![CI](https://github.com/sohei-t/budget-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/sohei-t/budget-tracker/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Tests](https://img.shields.io/badge/Tests-66%20passing-brightgreen)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

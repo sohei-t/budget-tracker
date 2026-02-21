@@ -1,5 +1,12 @@
 # Budget Tracker
 
+[![CI](https://github.com/sohei-t/budget-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/sohei-t/budget-tracker/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Tests](https://img.shields.io/badge/Tests-66%20passing-brightgreen)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 WBS（Work Breakdown Structure）形式のタスク・進捗管理Webアプリケーション。大項目・中項目・小項目の3階層でタスクを管理し、予定と実績を記録することで進捗を可視化します。
 
 ## 概要
