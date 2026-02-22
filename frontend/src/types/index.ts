@@ -85,3 +85,26 @@ export interface BreadcrumbItem {
 }
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
+
+/** API client request error with HTTP status */
+export interface RequestError extends Error {
+  readonly code: string
+  readonly status: number
+  readonly details: ReadonlyArray<string>
+}
+
+/** Immutable task data from API */
+export type ReadonlyTask = Readonly<Task>
+
+/** Fields required when creating a new task */
+export type TaskCreateData = Omit<TaskFormData, 'status' | 'progress_percent'>
+
+/** Fields that can be updated on an existing task */
+export type TaskUpdateData = Partial<TaskFormData>
+
+/** Hook return type for async data loading */
+export interface AsyncState<T> {
+  readonly data: T | null
+  readonly loading: boolean
+  readonly error: string | null
+}

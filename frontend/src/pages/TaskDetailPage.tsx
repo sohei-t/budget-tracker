@@ -45,7 +45,10 @@ export function TaskDetailPage() {
   if (error || !task) {
     return (
       <EmptyState icon="&#9888;" text={error || 'Task not found'}>
-        <Link to="/tasks" className="btn btn--secondary">Back to Tasks</Link>
+        <div className="flex gap-4">
+          <button className="btn btn--secondary" onClick={() => refetch()}>Retry</button>
+          <Link to="/tasks" className="btn btn--secondary">Back to Tasks</Link>
+        </div>
       </EmptyState>
     )
   }

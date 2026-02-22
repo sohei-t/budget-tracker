@@ -40,8 +40,8 @@ export function useTask(taskId: string): UseTaskReturn {
           if (mountedRef.current) {
             setChildren(childRes.data ?? [])
           }
-        } catch {
-          // ignore
+        } catch (err) {
+          console.error('Failed to load child tasks:', err)
         }
       } else {
         setChildren([])

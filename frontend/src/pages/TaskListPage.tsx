@@ -5,7 +5,7 @@ import { EmptyState } from '../components/ui/EmptyState.tsx'
 import { TaskTable } from '../components/task/TaskTable.tsx'
 
 export function TaskListPage() {
-  const { tasks, expandedIds, loading, error, toggleExpand, expandAll, collapseAll } = useTasks()
+  const { tasks, expandedIds, loading, error, toggleExpand, expandAll, collapseAll, refetch } = useTasks()
 
   if (loading) return <LoadingSpinner />
 
@@ -13,7 +13,7 @@ export function TaskListPage() {
     return (
       <div className="task-list-page">
         <EmptyState icon="&#9888;" text={`Failed to load tasks: ${error}`}>
-          <Link to="/tasks" className="btn btn--secondary">Retry</Link>
+          <button className="btn btn--secondary" onClick={() => refetch()}>Retry</button>
         </EmptyState>
       </div>
     )

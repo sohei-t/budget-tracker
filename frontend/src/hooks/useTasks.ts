@@ -32,8 +32,8 @@ export function useTasks(): {
           }
           return [...currentTasks, ...newTasks]
         }
-      } catch {
-        // silently fail
+      } catch (err) {
+        console.error('Failed to load children:', err)
       }
     }
     return currentTasks

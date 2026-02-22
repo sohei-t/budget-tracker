@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
 
 interface ModalConfig {
   title: string
@@ -43,8 +43,10 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const value = useMemo(() => ({ modalState, showConfirm, closeModal }), [modalState, showConfirm, closeModal])
+
   return (
-    <ModalContext.Provider value={{ modalState, showConfirm, closeModal }}>
+    <ModalContext.Provider value={value}>
       {children}
     </ModalContext.Provider>
   )

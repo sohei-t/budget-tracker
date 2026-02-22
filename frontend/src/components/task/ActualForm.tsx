@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { useActualForm } from '../../hooks/useActualForm.ts'
 
 interface ActualFormProps {
@@ -6,7 +6,7 @@ interface ActualFormProps {
   onSuccess: () => void
 }
 
-export function ActualForm({ taskId, onSuccess }: ActualFormProps) {
+export const ActualForm = React.memo(function ActualForm({ taskId, onSuccess }: ActualFormProps) {
   const { fields, submitting, updateField, handleSubmit } = useActualForm(taskId, onSuccess)
 
   const onSubmit = useCallback(
@@ -65,4 +65,4 @@ export function ActualForm({ taskId, onSuccess }: ActualFormProps) {
       </div>
     </form>
   )
-}
+})

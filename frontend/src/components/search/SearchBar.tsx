@@ -21,7 +21,9 @@ export function SearchBar({ isOpen, onToggle }: SearchBarProps) {
     if (isOpen) {
       getTasks()
         .then(res => setTasks(res.data ?? []))
-        .catch(() => {})
+        .catch((err) => {
+          console.error('Failed to load tasks for search:', err)
+        })
       setTimeout(() => inputRef.current?.focus(), 50)
     } else {
       setQuery('')

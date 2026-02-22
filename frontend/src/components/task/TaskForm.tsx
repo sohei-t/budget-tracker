@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 import type { Task, ProgressMode, TaskStatus } from '../../types/index.ts'
 import { Breadcrumb } from '../ui/Breadcrumb.tsx'
 import type { BreadcrumbItem } from '../../types/index.ts'
@@ -11,7 +11,7 @@ interface TaskFormProps {
   isEdit: boolean
 }
 
-export function TaskForm({ task, parentTask, isEdit }: TaskFormProps) {
+export const TaskForm = React.memo(function TaskForm({ task, parentTask, isEdit }: TaskFormProps) {
   const level = parentTask ? parentTask.level + 1 : 1
 
   const { fields, nameError, submitting, updateField, handleSubmit } = useTaskForm({
@@ -206,4 +206,4 @@ export function TaskForm({ task, parentTask, isEdit }: TaskFormProps) {
       </form>
     </div>
   )
-}
+})
