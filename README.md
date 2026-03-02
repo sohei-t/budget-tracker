@@ -1,311 +1,499 @@
-# Budget Tracker
+# Budget Tracker -- WBS Task & Progress Management
 
-[![CI](https://github.com/sohei-t/budget-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/sohei-t/budget-tracker/actions/workflows/ci.yml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
-[![Tests](https://img.shields.io/badge/Tests-66%20passing-brightgreen)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Test Coverage](https://img.shields.io/badge/Coverage-97.92%25-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Tests-270%20passing-brightgreen)]()
 
-WBS（Work Breakdown Structure）形式のタスク・進捗管理Webアプリケーション。大項目・中項目・小項目の3階層でタスクを管理し、予定と実績を記録することで進捗を可視化します。
+A professional **WBS (Work Breakdown Structure)** based task and progress management web application. Organize work into a clear 3-tier hierarchy of major, middle, and minor tasks while tracking planned versus actual effort in real time. Built with a modern React + TypeScript frontend and a robust Express.js + SQLite backend, the application runs entirely on your local network with zero cloud dependencies.
 
-## 概要
+---
 
-Budget Trackerは、プロジェクト管理に最適なWBSライクなタスク管理ツールです。予定工数と実績工数を管理し、進捗率や遅延率を自動計算します。ダークモード対応、キーボードショートカット、高速検索機能を備えた、モダンなSPA（Single Page Application）です。
+## Screenshots
 
-## 主な機能
+> _Screenshots coming soon -- Dashboard view, Task hierarchy, and Dark mode._
 
-### タスク管理
-- **3階層タスク構造**: 大項目 → 中項目 → 小項目のツリー構造
-- **予定管理**: 開始日・終了日・予定工数（時間）を設定
-- **実績記録**: 作業時間を記録し、自動的に進捗率を計算
-- **進捗可視化**: プログレスバーで進捗を直感的に把握
-- **遅延検知**: 遅れているタスクを自動的に警告表示
+<!-- Replace the line above with actual screenshot images when available:
+![Dashboard](docs/screenshots/dashboard.png)
+![Task List](docs/screenshots/task-list.png)
+![Dark Mode](docs/screenshots/dark-mode.png)
+-->
 
-### UI/UX
-- **ダークモード**: システム設定に自動追従、手動切り替えも可能
-- **レスポンシブデザイン**: モバイル・タブレット・デスクトップに対応
-- **キーボードショートカット**:
-  - `G + D`: Dashboard表示
-  - `G + T`: Tasks表示
-  - `N`: 新規タスク作成
-  - `Ctrl + K`: 検索
-  - `Ctrl + D`: ダークモード切り替え
-  - `?`: ショートカット一覧表示
-- **高速検索**: インクリメンタルサーチでタスクを即座に検索
+---
 
-### パフォーマンス
-- **高速起動**: SQLite WALモード、最適化されたクエリ
-- **効率的なレンダリング**: イベント委譲、仮想DOM不使用のバニラJS
-- **LAN内アクセス**: 同じネットワーク内のデバイスからアクセス可能
+## Features
 
-## 技術スタック
+### Task Management
+- **3-tier WBS hierarchy** -- Major items, middle items, and minor items organized in a tree structure
+- **Schedule planning** -- Set start date, end date, and planned effort (hours) for each task
+- **Actual effort recording** -- Log daily work hours with optional notes; supports upsert per date
+- **Automatic progress calculation** -- Progress percentage derived from actual vs. planned hours
+- **Delay detection** -- Tasks are flagged as "at risk" or "overdue" based on schedule and progress
+- **Drag-and-drop reordering** -- Change task display order within the same level
+- **Soft delete** -- Safely remove tasks without losing historical data
 
-### バックエンド
-- **Node.js** 18+ LTS
-- **Express** 4.x - Webフレームワーク
-- **better-sqlite3** - SQLiteドライバ（WALモード有効化）
-- **Helmet** - セキュリティヘッダー
-- **CORS** - クロスオリジン対応
-- **Compression** - gzip圧縮
+### Dashboard
+- **Project health metrics** -- Total tasks, completed, in-progress, and not-started counts
+- **Overall progress** -- Aggregated progress percentage across the entire project
+- **Delayed tasks panel** -- At-a-glance view of overdue and at-risk items with severity indicators
+- **Major items overview** -- Top-level task summaries with inline progress bars
 
-### フロントエンド
-- **Vanilla JavaScript** (ES2020+) - フレームワークレス
-- **Custom CSS Variables** - テーマ切り替え
-- **Hash-based Routing** - SPAルーティング
-- **LocalStorage** - クライアント側状態管理
+### UI / UX
+- **Dark mode** -- Follows system preference with a manual toggle; persisted in LocalStorage
+- **Responsive design** -- Fully functional on mobile, tablet, and desktop viewports
+- **Keyboard shortcuts** -- Navigate and operate the app without touching the mouse
+- **Incremental search** -- Filter tasks instantly as you type with debounced queries
+- **Toast notifications** -- Non-intrusive feedback for create, update, and delete operations
+- **Modal dialogs** -- Contextual forms for task creation, editing, and actual recording
+- **Breadcrumb navigation** -- Always know where you are in the task hierarchy
 
-### テスト
-- **Jest** 29.x - テストフレームワーク
-- **Supertest** 6.x - API統合テスト
-- **カバレッジ**: 97.92% (270件のテスト、100%合格)
+### Performance
+- **SQLite WAL mode** -- Concurrent reads and writes without lock contention
+- **Optimized queries** -- Parent-child joins eliminate N+1 patterns
+- **Gzip compression** -- Reduced payload sizes over the network
+- **ETag caching** -- Conditional responses for unchanged data
+- **LAN-accessible** -- Binds to `0.0.0.0` so any device on the same network can connect
 
-### セキュリティ
-- **Helmet**: セキュリティヘッダー設定
-- **CORS**: クロスオリジン制御
-- **XSS対策**: 入力サニタイゼーション
-- **CSRF対策**: トークン検証（計画中）
+---
 
-## セットアップ
+## Architecture
 
-### 必要な環境
-- Node.js 18.0.0以上
-- npm 8.0.0以上
+The application follows an **MVC (Model-View-Controller)** pattern on the backend with a clear separation of concerns. The frontend uses a component-based architecture powered by React 19, with custom hooks and context providers for state management.
 
-### インストール
+```
++------------------------------------------------------+
+|                     Client (Browser)                  |
+|                                                       |
+|   React 19 + TypeScript 5.9 + Vite 7  (Modern SPA)   |
+|   +-----------+  +--------+  +----------+  +------+  |
+|   | Pages     |  | Hooks  |  | Context  |  | API  |  |
+|   | Dashboard |  | useApi |  | Theme    |  | tasks|  |
+|   | TaskList  |  | useTask|  | Modal    |  | dash |  |
+|   | TaskNew   |  | useDash|  | Toast    |  | actls|  |
+|   | TaskEdit  |  | useKbd |  |          |  |      |  |
+|   | TaskDetail|  | useSrch|  |          |  |      |  |
+|   +-----------+  +--------+  +----------+  +------+  |
+|                                                       |
+|   Legacy Vanilla JS SPA (public/)  -- fallback UI     |
++---------------------------+---------------------------+
+                            | HTTP / REST API
+                            v
++---------------------------+---------------------------+
+|                     Server (Node.js)                  |
+|                                                       |
+|   Express.js 4.x  +  Middleware Stack                 |
+|   +----------+  +------------+  +------------------+  |
+|   | Helmet   |  | Compression|  | CORS | Morgan    |  |
+|   +----------+  +------------+  +------------------+  |
+|                                                       |
+|   Routes          Controllers       Services          |
+|   +-----------+   +------------+   +--------------+   |
+|   | /tasks    |-->| taskCtrl   |-->| taskService  |   |
+|   | /actuals  |-->| actualCtrl |-->| actualService|   |
+|   | /dashboard|-->| dashCtrl   |-->| dashService  |   |
+|   +-----------+   +------------+   | progressSvc  |   |
+|                                    +--------------+   |
+|                                          |            |
+|   Models                                 v            |
+|   +-----------+   +-------------------------------+   |
+|   | taskModel |<--| better-sqlite3 (WAL mode)     |   |
+|   | actualMdl |   | data/budget-tracker.db        |   |
+|   | db.js     |   +-------------------------------+   |
+|   +-----------+                                       |
++-------------------------------------------------------+
+```
+
+### Request Flow
+
+```
+Client Request
+    |
+    v
+Express Router  -->  Controller  -->  Service  -->  Model  -->  SQLite
+    |                    |               |              |
+    v                    v               v              v
+Route matching     Validation     Business logic   SQL queries
+                   HTTP response  Error handling    Prepared stmts
+```
+
+---
+
+## Tech Stack
+
+### Backend
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Runtime | Node.js 18+ | Server-side JavaScript |
+| Framework | Express.js 4.x | HTTP routing and middleware |
+| Database | SQLite (better-sqlite3) | Embedded relational database (WAL mode) |
+| Security | Helmet 7.x | HTTP security headers |
+| CORS | cors 2.x | Cross-origin resource sharing |
+| Compression | compression 1.x | Gzip response compression |
+| Logging | Morgan 1.x | HTTP request logging |
+
+### Frontend (Modern)
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| UI Library | React 19 | Component-based UI |
+| Language | TypeScript 5.9 | Static type safety |
+| Build Tool | Vite 7.x | Fast HMR and bundling |
+| Routing | React Router DOM 7.x | Client-side page navigation |
+| Styling | CSS Variables + Custom CSS | Theming and dark mode |
+| State | React Context + Custom Hooks | Application state management |
+
+### Frontend (Legacy Fallback)
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Language | Vanilla JavaScript (ES2020+) | Framework-free SPA |
+| Routing | Hash-based router | Client-side navigation |
+| State | Custom store + LocalStorage | Lightweight state management |
+
+### Testing
+
+| Tool | Version | Purpose |
+|---|---|---|
+| Jest | 29.x | Backend test runner and assertions |
+| Supertest | 6.x | HTTP integration testing |
+| Vitest | 4.x | Frontend test runner (Vite-native) |
+| React Testing Library | 16.x | Component behavior testing |
+| Testing Library User Event | 14.x | Simulated user interactions |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js** 18.0.0 or higher
+- **npm** 8.0.0 or higher
+
+### Installation
 
 ```bash
-# リポジトリをクローン
-git clone https://github.com/yourusername/budget-tracker.git
+# Clone the repository
+git clone https://github.com/sohei-t/budget-tracker.git
 cd budget-tracker
 
-# 依存関係をインストール
+# Install backend dependencies
 npm install
 
-# サーバーを起動
+# Install frontend dependencies
+cd frontend
+npm install
+cd ..
+```
+
+### Running the Application
+
+#### Production Mode (Legacy UI)
+
+```bash
 npm start
 ```
 
-サーバーが起動したら、ブラウザで以下にアクセス:
-- **ローカル**: http://localhost:3000
-- **LAN内**: http://<your-ip>:3000
+The server starts on port 3000, serving the legacy vanilla JS frontend from `public/`.
 
-### 開発モード
+#### Development Mode (Modern React UI)
+
+In one terminal, start the backend with auto-reload:
 
 ```bash
-# 自動リロード付きで起動
 npm run dev
 ```
 
-## 使い方
+In another terminal, start the Vite dev server for the React frontend:
 
-### 初回起動
-1. サーバーを起動 (`npm start`)
-2. ブラウザで http://localhost:3000 にアクセス
-3. Dashboard画面が表示されます
-
-### タスクの作成
-1. 「Tasks」ページへ移動
-2. 「New Task」ボタンをクリック（またはキーボードで `N` を押す）
-3. タスク情報を入力:
-   - **名前**: タスクの名称
-   - **階層**: 大項目・中項目・小項目
-   - **親タスク**: 中項目・小項目の場合は親を選択
-   - **予定**: 開始日・終了日・予定工数（時間）
-4. 「Create」ボタンで保存
-
-### 実績の記録
-1. タスク行をクリックして詳細を表示
-2. 「Record Work」ボタンをクリック
-3. 作業時間（時間）と日付を入力
-4. 「Save」で記録
-
-### 進捗の確認
-- **Dashboard**: 全体の進捗サマリーを表示
-- **Tasks**: 各タスクの詳細な進捗を表示
-- **プログレスバー**: 各タスク行に進捗率を表示
-- **遅延警告**: 遅れているタスクは赤く表示
-
-## テスト実行
-
-### 全テストを実行
 ```bash
-npm test
+cd frontend
+npm run dev
 ```
 
-### カバレッジレポート付きで実行
+#### Building the React Frontend
+
 ```bash
-npm run test:coverage
+cd frontend
+npm run build
 ```
 
-### ウォッチモード（開発中）
-```bash
-npm run test:watch
-```
+The production build outputs to `frontend/dist/`. When this directory exists, the Express server automatically serves it instead of the legacy `public/` folder.
 
-### テスト結果
-- **総テスト数**: 270件
-- **合格率**: 100%
-- **カバレッジ**: 97.92%
-  - Statements: 97.92%
-  - Branches: 94.05%
-  - Functions: 100%
-  - Lines: 97.92%
+#### Access
 
-## ディレクトリ構造
+| Location | URL |
+|---|---|
+| Local | `http://localhost:3000` |
+| LAN (any device) | `http://<your-ip>:3000` |
 
-```
-budget-tracker/
-├── public/                 # フロントエンド（静的ファイル）
-│   ├── index.html          # エントリーポイント
-│   ├── css/
-│   │   └── main.css        # スタイルシート（CSS Variables使用）
-│   └── js/
-│       ├── app.js          # アプリケーション初期化
-│       ├── router.js       # ハッシュベースルーティング
-│       ├── store.js        # 状態管理
-│       ├── api.js          # APIクライアント
-│       ├── components/     # UIコンポーネント
-│       │   ├── dashboard.js
-│       │   ├── taskList.js
-│       │   ├── taskDetail.js
-│       │   ├── taskForm.js
-│       │   ├── actualForm.js
-│       │   ├── progressBar.js
-│       │   ├── modal.js
-│       │   └── toast.js
-│       └── utils/          # ユーティリティ
-│           ├── dom.js
-│           ├── dates.js
-│           └── shortcuts.js
-├── src/                    # バックエンド（Node.js + Express）
-│   ├── server.js           # サーバーエントリーポイント
-│   ├── models/             # データモデル（SQLite）
-│   │   ├── task.js
-│   │   ├── actual.js
-│   │   └── db.js
-│   ├── services/           # ビジネスロジック
-│   │   ├── taskService.js
-│   │   └── actualService.js
-│   ├── controllers/        # リクエストハンドラー
-│   │   ├── taskController.js
-│   │   └── actualController.js
-│   ├── routes/             # ルート定義
-│   │   ├── tasks.js
-│   │   └── actuals.js
-│   ├── middleware/         # ミドルウェア
-│   │   ├── errorHandler.js
-│   │   └── validator.js
-│   └── utils/              # ユーティリティ
-│       └── logger.js
-├── tests/                  # テストコード（Jest）
-│   ├── models/
-│   ├── services/
-│   ├── controllers/
-│   └── integration/
-├── data/                   # データベースファイル
-│   └── budget-tracker.db   # SQLiteデータベース
-├── package.json            # npm設定
-└── README.md               # このファイル
-```
+---
 
-## API仕様
+## API Reference
 
-### タスクAPI
+All API responses follow a consistent envelope format:
 
-#### GET /api/tasks
-すべてのタスクを取得
-
-**レスポンス**:
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "開発フェーズ",
-      "level": "large",
-      "parent_id": null,
-      "planned_start": "2024-01-01",
-      "planned_end": "2024-03-31",
-      "planned_hours": 480,
-      "actual_hours": 120,
-      "progress_rate": 25,
-      "is_delayed": false
-    }
-  ]
+  "data": { ... },
+  "meta": { ... }
 }
 ```
 
-#### GET /api/tasks/:id
-特定のタスクを取得
+### Tasks
 
-#### POST /api/tasks
-新規タスクを作成
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/tasks` | List all top-level (Level 1) tasks |
+| `GET` | `/api/tasks/:id` | Get a single task by ID |
+| `GET` | `/api/tasks/:id/children` | Get all child tasks of a parent |
+| `POST` | `/api/tasks` | Create a new task |
+| `PUT` | `/api/tasks/:id` | Update an existing task |
+| `DELETE` | `/api/tasks/:id` | Soft-delete a task |
+| `PUT` | `/api/tasks/:id/reorder` | Update a task's sort order |
 
-**リクエストボディ**:
+#### Create / Update Task -- Request Body
+
 ```json
 {
-  "name": "タスク名",
-  "level": "large|medium|small",
-  "parent_id": 1,
-  "planned_start": "2024-01-01",
-  "planned_end": "2024-01-31",
-  "planned_hours": 40
+  "name": "Design Phase",
+  "description": "UI/UX design tasks",
+  "parent_id": null,
+  "planned_start_date": "2025-01-01",
+  "planned_end_date": "2025-01-31",
+  "planned_effort_hours": 80,
+  "progress_mode": "auto",
+  "status": "in_progress"
 }
 ```
 
-#### PUT /api/tasks/:id
-タスクを更新
+### Actuals (Work Logs)
 
-#### DELETE /api/tasks/:id
-タスクを削除
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/tasks/:id/actuals` | Get all actual entries for a task |
+| `POST` | `/api/tasks/:id/actuals` | Record a daily actual (upsert by date) |
+| `PUT` | `/api/actuals/:id` | Update an actual entry |
+| `DELETE` | `/api/actuals/:id` | Delete an actual entry |
 
-### 実績API
+#### Record Actual -- Request Body
 
-#### GET /api/actuals
-すべての実績を取得
-
-#### POST /api/actuals
-実績を記録
-
-**リクエストボディ**:
 ```json
 {
-  "task_id": 1,
-  "work_date": "2024-01-15",
-  "hours": 8,
-  "description": "作業内容"
+  "work_date": "2025-01-15",
+  "actual_hours": 6.5,
+  "notes": "Completed wireframes for dashboard"
 }
 ```
 
-#### PUT /api/actuals/:id
-実績を更新
+### Dashboard
 
-#### DELETE /api/actuals/:id
-実績を削除
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/dashboard` | Get overall project summary and metrics |
+| `GET` | `/api/dashboard/delays` | Get list of delayed and at-risk tasks |
 
-## パフォーマンス最適化
+#### Dashboard Summary -- Response Example
 
-- **SQLite WALモード**: 読み書き並行処理の高速化
-- **PRAGMA最適化**: journal_mode, synchronous, cache_size, temp_store
-- **N+1クエリ削減**: 親子関係をJOINで一度に取得
-- **イベント委譲**: DOMイベントリスナーを最小化
-- **Compression**: gzip圧縮でレスポンスサイズを削減
+```json
+{
+  "success": true,
+  "data": {
+    "total_tasks": 42,
+    "completed_tasks": 15,
+    "in_progress_tasks": 20,
+    "not_started_tasks": 7,
+    "overall_progress_percent": 48.5,
+    "overdue_count": 3,
+    "at_risk_count": 5,
+    "major_items": [ ... ]
+  }
+}
+```
 
-## セキュリティ対策
+---
 
-- **Helmet**: セキュリティヘッダー（XSS、Clickjacking対策）
-- **CORS**: 許可されたオリジンのみアクセス可能
-- **入力検証**: すべての入力をバリデーション
-- **SQLインジェクション対策**: プリペアドステートメント使用
-- **XSS対策**: HTML特殊文字のエスケープ
+## Testing
 
-## ライセンス
+### Backend Tests (Jest + Supertest)
 
+```bash
+# Run all backend tests
+npm test
+
+# Run with coverage report
+npm run test:coverage
+
+# Run in watch mode during development
+npm run test:watch
+```
+
+### Frontend Tests (Vitest + React Testing Library)
+
+```bash
+cd frontend
+
+# Run all frontend tests
+npm test
+
+# Run in watch mode
+npm run test:watch
+```
+
+### Coverage Summary
+
+| Metric | Coverage |
+|---|---|
+| Statements | 97.92% |
+| Branches | 94.05% |
+| Functions | 100% |
+| Lines | 97.92% |
+| **Total Tests** | **270 passing** |
+
+Test suites span unit tests (models, services, controllers, middleware, utilities) and integration tests (full API round-trips with Supertest).
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `G` then `D` | Navigate to Dashboard |
+| `G` then `T` | Navigate to Tasks |
+| `N` | Create a new task |
+| `Ctrl + K` | Open search |
+| `Ctrl + D` | Toggle dark mode |
+| `?` | Show keyboard shortcuts dialog |
+
+All shortcuts are disabled when an input field or text area is focused to avoid interference with typing.
+
+---
+
+## Project Structure
+
+```
+budget-tracker/
+|-- src/                        # Backend (Node.js + Express)
+|   |-- server.js               # Application entry point
+|   |-- routes/
+|   |   |-- taskRoutes.js       # /api/tasks endpoints
+|   |   |-- actualRoutes.js     # /api/actuals endpoints
+|   |   +-- dashboardRoutes.js  # /api/dashboard endpoints
+|   |-- controllers/
+|   |   |-- taskController.js   # Task request handlers
+|   |   |-- actualController.js # Actual request handlers
+|   |   +-- dashboardController.js
+|   |-- services/
+|   |   |-- taskService.js      # Task business logic
+|   |   |-- actualService.js    # Actual business logic
+|   |   |-- dashboardService.js # Dashboard aggregation
+|   |   +-- progressService.js  # Progress calculation engine
+|   |-- models/
+|   |   |-- db.js               # SQLite connection (WAL mode)
+|   |   |-- taskModel.js        # Task data access
+|   |   +-- actualModel.js      # Actual data access
+|   |-- middleware/
+|   |   +-- errorHandler.js     # Centralized error handling
+|   +-- utils/
+|       +-- networkUtils.js     # LAN IP detection
+|
+|-- frontend/                   # Modern React frontend
+|   |-- src/
+|   |   |-- main.tsx            # React entry point
+|   |   |-- App.tsx             # Root component with routing
+|   |   |-- pages/              # Page-level components
+|   |   |   |-- DashboardPage.tsx
+|   |   |   |-- TaskListPage.tsx
+|   |   |   |-- TaskNewPage.tsx
+|   |   |   |-- TaskEditPage.tsx
+|   |   |   +-- TaskDetailPage.tsx
+|   |   |-- components/         # Reusable UI components
+|   |   |   |-- dashboard/      # Dashboard-specific components
+|   |   |   |-- task/           # Task-specific components
+|   |   |   |-- layout/         # Header, Nav, Shortcuts dialog
+|   |   |   |-- search/         # Search bar and results
+|   |   |   +-- ui/             # Generic UI primitives
+|   |   |-- hooks/              # Custom React hooks
+|   |   |-- context/            # Theme, Modal, Toast providers
+|   |   |-- api/                # API client modules
+|   |   |-- types/              # TypeScript type definitions
+|   |   +-- styles/             # CSS modules and variables
+|   |-- vite.config.ts
+|   +-- tsconfig.json
+|
+|-- public/                     # Legacy vanilla JS frontend (fallback)
+|   |-- index.html
+|   |-- css/main.css
+|   +-- js/
+|       |-- app.js
+|       |-- router.js
+|       |-- store.js
+|       |-- api.js
+|       |-- components/
+|       +-- utils/
+|
+|-- tests/                      # Backend test suites (Jest)
+|   |-- unit/
+|   |   |-- models/
+|   |   |-- services/
+|   |   |-- controllers/
+|   |   |-- middleware/
+|   |   +-- utils/
+|   |-- integration/
+|   +-- helpers/
+|
+|-- data/                       # SQLite database files
+|   +-- budget-tracker.db
+|
+|-- package.json
++-- README.md
+```
+
+---
+
+## Security
+
+| Measure | Implementation |
+|---|---|
+| HTTP Security Headers | Helmet.js with strict CSP directives |
+| Cross-Origin Control | CORS middleware with configurable allowed origins |
+| SQL Injection Prevention | Prepared statements via better-sqlite3 (parameterized queries only) |
+| XSS Protection | Input sanitization and HTML entity escaping; CSP `script-src 'self'` |
+| Input Validation | Server-side validation on all endpoints with typed error responses |
+| Request Size Limits | JSON body parser limited to 256 KB |
+| Content Security Policy | `default-src 'self'`; restricted script, style, image, and font sources |
+
+---
+
+## Contributing
+
+Contributions are welcome. To get started:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Write tests for your changes and ensure all 270 existing tests pass
+4. Maintain or improve the current 97.92% test coverage
+5. Commit your changes with descriptive messages
+6. Push to your fork and open a Pull Request
+
+Please follow the existing code style:
+- Backend: CommonJS modules, JSDoc comments, strict mode
+- Frontend: TypeScript with strict mode, functional React components, custom hooks
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+```
 MIT License
 
-Copyright (c) 2024 Budget Tracker Team
+Copyright (c) 2024 AI Agent Development System
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -314,8 +502,8 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -324,7 +512,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-**Generated with [Claude Code](https://claude.com/claude-code)**
+```
