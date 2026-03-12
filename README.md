@@ -14,7 +14,7 @@ A professional **WBS (Work Breakdown Structure)** based task and progress manage
 
 ## Screenshots
 
-> _Screenshots coming soon -- Dashboard view, Task hierarchy, and Dark mode._
+> Screenshots are planned for a future release.
 
 <!-- Replace the line above with actual screenshot images when available:
 ![Dashboard](docs/screenshots/dashboard.png)
