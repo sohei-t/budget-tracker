@@ -16,13 +16,13 @@
 
 **公開されている情報（7行目）:**
 ```javascript
-keyFilename: '/Users/tsujisouhei/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json'
+keyFilename: '$GOOGLE_APPLICATION_CREDENTIALS'
 ```
 
 ### 露出している情報
 
 1. **ユーザー名**: `tsujisouhei`
-2. **ローカルパス**: `/Users/tsujisouhei/Desktop/git-worktree-agent/`
+2. **ローカルパス**: `$AGENT_TEMPLATE_DIR/`
 3. **認証ファイル名**: `gcp-workflow-key.json`
 4. **ディレクトリ構造**: `credentials/` フォルダの存在
 
@@ -79,7 +79,7 @@ const client = new textToSpeech.TextToSpeechClient({
 });
 
 // ワークフローで以下を実行し忘れる可能性
-export GOOGLE_APPLICATION_CREDENTIALS="~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json"
+export GOOGLE_APPLICATION_CREDENTIALS="$GOOGLE_APPLICATION_CREDENTIALS"
 ```
 
 **Claude Codeの自動化では:**

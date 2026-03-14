@@ -15,7 +15,7 @@
 - **行**: 7
 - **内容**: ローカルファイルパスが露出
   ```javascript
-  keyFilename: '/Users/tsujisouhei/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json'
+  keyFilename: '$GOOGLE_APPLICATION_CREDENTIALS'
   ```
 
 **リスク評価:**
@@ -118,7 +118,7 @@ ai-agent-portfolio/
 **現在のコード:**
 ```javascript
 const client = new textToSpeech.TextToSpeechClient({
-    keyFilename: '/Users/tsujisouhei/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json'
+    keyFilename: '$GOOGLE_APPLICATION_CREDENTIALS'
 });
 ```
 

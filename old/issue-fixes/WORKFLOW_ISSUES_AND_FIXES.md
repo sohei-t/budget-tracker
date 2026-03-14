@@ -111,7 +111,7 @@ phase_5_checkpoint:
       status: "pending"
 
     - task: "documenter_agent.py実行"
-      command: "python3 ~/Desktop/git-worktree-agent/src/documenter_agent.py"
+      command: "python3 $AGENT_TEMPLATE_DIR/src/documenter_agent.py"
       status: "pending"
 
     - task: "音声生成"

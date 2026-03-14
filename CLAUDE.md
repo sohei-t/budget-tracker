@@ -132,7 +132,7 @@ api_auth_check:
   gcp_settings:
     project_id_env: "GCP_PROJECT_ID"
     credentials_env: "GOOGLE_APPLICATION_CREDENTIALS"
-    default_project: "{GCP_PROJECT_ID}"
+    default_project: "${GCP_PROJECT_ID}"
     default_credentials: "~/.config/ai-agents/credentials/gcp/default.json"
 
   enabled_apis:
@@ -2478,7 +2478,7 @@ validate_phase5() {
 
 **このディレクトリは専用のアプリ開発環境です**
 - アプリ名: budget-tracker
-- 環境パス: .
+- 環境パス: (project root directory)
 
 ### 開発完了後の処理
 

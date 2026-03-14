@@ -51,7 +51,7 @@ Phase 5: 3つのTaskを1メッセージで実行
 各Phaseの並列タスク完了後、`autonomous_evaluator.py` で最良を選択：
 
 ```bash
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . <worktree1> <worktree2> ...
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . <worktree1> <worktree2> ...
 ```
 
 ### 3. mainブランチ統合
@@ -208,7 +208,7 @@ Task 2: Planning B - 革新的アプローチ
 ```bash
 # 2つの計画案を評価（--skip-file-check で IMAGE_PROMPTS.json チェックをスキップ）
 # --auto-merge で自動的にmainへマージ＆全worktreeへ同期
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase1-planning-a phase1-planning-b \
   --auto-merge --skip-file-check --phase=phase1
 
@@ -241,7 +241,7 @@ python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
 # 5. AUDIO_PROMPTS.json 作成（音声生成が必要な場合）
 
 # これらが完了したら、再度評価してPhase 2用worktreeに同期:
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase1-planning-a phase1-planning-b \
   --auto-merge
 
@@ -414,7 +414,7 @@ Task 3: Prototype C - サーバーレスアーキテクチャ
 
 ```bash
 # 3つのプロトタイプをUX最優先で評価し、自動マージ
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator_ux.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator_ux.py . \
   phase2-impl-prototype-a phase2-impl-prototype-b phase2-impl-prototype-c \
   --auto-merge --phase=phase2
 
@@ -592,7 +592,7 @@ Task 2: Quality Optimization B - パフォーマンス重視
 #### ステップ2: 自律評価
 
 ```bash
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase4-quality-opt-a phase4-quality-opt-b
 ```
 
@@ -646,7 +646,7 @@ Task: Phase 5 完成処理
 
     2. documenter_agent.py 実行（全成果物を一括生成）
        ```bash
-       python3 ~/Desktop/git-worktree-agent/src/documenter_agent.py
+       python3 $AGENT_TEMPLATE_DIR/src/documenter_agent.py
        ```
 
     3. 生成物確認:
@@ -682,8 +682,8 @@ Task: Phase 5 完成処理
       2. **GCP TTS（フォールバック）**: GCP認証ファイルがある場合
     - GCP認証の検出順序:
       1. ./ai-agents-config/credentials/gcp.json（ローカル設定）
-      2. ./credentials/gcp-workflow-key.json（プロジェクト内）
-      3. ../credentials/gcp-workflow-key.json（親ディレクトリ）
+      2. ./credentials/gcp-credentials.json（プロジェクト内）
+      3. ../credentials/gcp-credentials.json（親ディレクトリ）
       4. ~/.config/ai-agents/credentials/gcp/default.json（グローバル設定）
     - 両方未設定の場合: explanation.mp3 はスキップされ、理由が記録されます
 ```
@@ -700,7 +700,7 @@ git merge phase/delivery
 
 ```bash
 # Phase 5完了直後に自動実行
-python3 ~/Desktop/git-worktree-agent/src/delivery_organizer.py
+python3 $AGENT_TEMPLATE_DIR/src/delivery_organizer.py
 
 # 確認:
 ls DELIVERY/<app-name>/
@@ -713,7 +713,7 @@ ls DELIVERY/<app-name>/
 
 ```bash
 # Phase 5.5完了直後に自動実行（Portfolio Appの場合のみ）
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 
 # 結果:
 # https://github.com/{username}/ai-agent-portfolio/tree/main/{app-name}/

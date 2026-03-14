@@ -18,7 +18,7 @@ gh repo delete portfolio-alien-game --yes
 
 # 正しいスクリプトで再公開
 cd ~/Desktop/AI-Apps/alien-game-agent
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 ```
 
 #### Option B: 既存リポジトリを修正
@@ -44,7 +44,7 @@ git push origin main
 
 ```bash
 # Phase 6では必ずこのスクリプトを使用
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 ```
 
 ### 3. 正しい公開構造

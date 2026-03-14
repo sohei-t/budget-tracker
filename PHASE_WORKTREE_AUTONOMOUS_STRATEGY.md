@@ -449,13 +449,13 @@ action: |
   git merge main
 
   # ドキュメント生成
-  python3 ~/Desktop/git-worktree-agent/src/documenter_agent.py
+  python3 $AGENT_TEMPLATE_DIR/src/documenter_agent.py
 
   # DELIVERY生成
-  python3 ~/Desktop/git-worktree-agent/src/delivery_organizer.py
+  python3 $AGENT_TEMPLATE_DIR/src/delivery_organizer.py
 
   # GitHub公開
-  python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+  python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 ```
 
 ---

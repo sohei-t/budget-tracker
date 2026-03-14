@@ -21,9 +21,8 @@ class DocumenterAgentV2:
         self.project_path = Path(project_path)
         # 実際のサービスアカウントキーのパス候補
         self.gcp_key_candidates = [
-            Path.home() / "Desktop" / "SKILLS" / "tts-api-key.json",
-            Path.home() / "Desktop" / "delete" / "credentials" / "gcp-workflow-key.json",
-            Path.home() / "Desktop" / "git-worktree-agent" / "credentials" / "gcp-workflow-key.json"
+            Path(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "")),
+            Path.home() / ".config" / "ai-agents" / "credentials" / "gcp" / "default.json",
         ]
 
     def get_project_details(self):
@@ -345,15 +344,12 @@ class DocumenterAgentV2:
 
 音声生成を有効にする方法:
 
-方法1: 既存のキーをコピー
-  cp ~/Desktop/SKILLS/tts-api-key.json ~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
-
-方法2: 新規作成
   1. Google Cloud Console で Text-to-Speech API を有効化
   2. サービスアカウントキーを作成
-  3. 以下のいずれかの場所に保存:
-     - ~/Desktop/SKILLS/tts-api-key.json
-     - ~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
+  3. 環境変数を設定:
+     export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/key.json
+  または:
+     ~/.config/ai-agents/credentials/gcp/default.json に配置
 """)
             return None
 

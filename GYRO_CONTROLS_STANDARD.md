@@ -718,6 +718,6 @@ export class InputSystem {
 - [ ] 右端配置でゲーム画面を邪魔しない
 
 ## 参考実装
-- 成功例: `/Users/tsujisouhei/Desktop/AI-Apps/monster-battles-agent/docs/src/systems/`
+- 成功例: `./monster-battles-agent/docs/src/systems/`
 - InputSystem.js (handleControlModeTap メソッド)
 - GyroControls.js (横向き対応版)

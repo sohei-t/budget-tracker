@@ -397,7 +397,7 @@ AUDIO_PROMPTS.json 構造:
        - 画像生成と同じ認証を使用
 
     3. GCP認証セットアップ
-       - gcp-workflow-key.json 確認（TTS/Imagen と共通）
+       - GCP credentials 確認（TTS/Imagen と共通、GOOGLE_APPLICATION_CREDENTIALS env var）
 
     4. Vertex AI Lyria API 実行
        - AUDIO_PROMPTS.json のプロンプトを使用

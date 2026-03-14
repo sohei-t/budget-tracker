@@ -927,10 +927,10 @@ class DocumenterAgent:
 
         優先順位:
         1. ローカル設定（プロジェクト固有）: ./ai-agents-config/credentials/gcp.json
-        2. 専用環境の認証: ./credentials/gcp-workflow-key.json
-        3. 親ディレクトリの認証: ../credentials/gcp-workflow-key.json
+        2. 専用環境の認証: ./credentials/gcp-credentials.json
+        3. 親ディレクトリの認証: ../credentials/gcp-credentials.json
         4. グローバル設定: ~/.config/ai-agents/credentials/gcp/default.json
-        5. テンプレート環境: ~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
+        5. GOOGLE_APPLICATION_CREDENTIALS environment variable
 
         Returns:
             Path or None: 認証ファイルのパス、見つからない場合はNone
@@ -938,10 +938,10 @@ class DocumenterAgent:
         # 候補パスを優先順位順に定義
         candidate_paths = [
             self.project_path / "ai-agents-config" / "credentials" / "gcp.json",  # ローカル設定
-            self.project_path / "credentials" / "gcp-workflow-key.json",  # 専用環境ルート
-            self.project_path.parent / "credentials" / "gcp-workflow-key.json",  # 親ディレクトリ（worktree内から実行時）
+            self.project_path / "credentials" / "gcp-credentials.json",  # 専用環境ルート
+            self.project_path.parent / "credentials" / "gcp-credentials.json",  # 親ディレクトリ（worktree内から実行時）
             Path.home() / ".config" / "ai-agents" / "credentials" / "gcp" / "default.json",  # グローバル設定
-            Path.home() / "Desktop" / "git-worktree-agent" / "credentials" / "gcp-workflow-key.json",  # テンプレート環境
+            Path(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "")),  # 環境変数
         ]
 
         for path in candidate_paths:
@@ -1015,13 +1015,13 @@ class DocumenterAgent:
             # 認証キー生成（環境に応じて保存先を決定）
             # 優先順位: 専用環境 > グローバル設定 > テンプレート環境
             if (self.project_path / "credentials").exists():
-                cred_path = self.project_path / "credentials" / "gcp-workflow-key.json"
+                cred_path = self.project_path / "credentials" / "gcp-credentials.json"
             elif (self.project_path.parent / "credentials").exists():
-                cred_path = self.project_path.parent / "credentials" / "gcp-workflow-key.json"
+                cred_path = self.project_path.parent / "credentials" / "gcp-credentials.json"
             elif (Path.home() / ".config" / "ai-agents" / "credentials" / "gcp").exists():
                 cred_path = Path.home() / ".config" / "ai-agents" / "credentials" / "gcp" / "default.json"
             else:
-                cred_path = Path.home() / "Desktop" / "git-worktree-agent" / "credentials" / "gcp-workflow-key.json"
+                cred_path = Path.home() / ".config" / "ai-agents" / "credentials" / "gcp" / "default.json"
 
             cred_path.parent.mkdir(parents=True, exist_ok=True)
 

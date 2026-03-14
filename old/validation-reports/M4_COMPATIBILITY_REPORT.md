@@ -116,7 +116,7 @@
    ~/bin/gh --version
 
    # 公開実行
-   python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+   python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
    ```
 
 3. **自律評価実行時**

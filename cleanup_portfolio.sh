@@ -2,7 +2,7 @@
 
 # ポートフォリオリポジトリのクリーンアップスクリプト
 
-PORTFOLIO_DIR="$HOME/Desktop/GitHub/ai-agent-portfolio"
+PORTFOLIO_DIR="${PORTFOLIO_DIR:-$HOME/ai-agent-portfolio}"
 
 echo "🧹 ポートフォリオリポジトリのクリーンアップ"
 echo "📁 対象: $PORTFOLIO_DIR"

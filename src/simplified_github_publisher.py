@@ -220,17 +220,28 @@ class SimplifiedGitHubPublisher:
 
         print("\n  📁 その他の不要ファイル/フォルダを除外中...")
 
+        # ホワイトリスト（除外から保護するディレクトリ）
+        whitelist_dirs = ['ai-docs']
+
         for dir_name in exclude_dirs:
             for dir_path in self.public_path.rglob(dir_name):
                 if dir_path.is_dir():
+                    rel = dir_path.relative_to(self.public_path)
+                    if any(part in whitelist_dirs for part in rel.parts):
+                        print(f"  ⏭️ 保護（ホワイトリスト）: {rel}/")
+                        continue
                     shutil.rmtree(dir_path)
-                    print(f"  ✅ 削除: {dir_path.relative_to(self.public_path)}/")
+                    print(f"  ✅ 削除: {rel}/")
 
         for pattern in exclude_patterns:
             for file in self.public_path.rglob(pattern):
                 if file.is_file():
+                    rel = file.relative_to(self.public_path)
+                    if any(part in whitelist_dirs for part in rel.parts):
+                        print(f"  ⏭️ 保護（ホワイトリスト）: {rel}")
+                        continue
                     file.unlink()
-                    print(f"  ✅ 削除: {file.relative_to(self.public_path)}")
+                    print(f"  ✅ 削除: {rel}")
 
     def clone_portfolio_repo(self, slug: str) -> Path:
         """ai-agent-portfolioリポジトリを一時ディレクトリにclone（M4 Mac対応）"""

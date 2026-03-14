@@ -47,7 +47,7 @@ CLAUDE.md の 1002-1009行目:
 Task 3: Audio Generator（GCP認証の自動セットアップ付き）
 - prompt: 音声生成用プロンプト（以下参照）
 - 実行フロー:
-  1. 認証ファイル確認（~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json）
+  1. 認証ファイル確認（$GOOGLE_APPLICATION_CREDENTIALS）
   2. 存在しない場合: use the gcp skill を宣言し、自動セットアップ実行
   3. 存在する場合: そのまま音声生成実行
 ```

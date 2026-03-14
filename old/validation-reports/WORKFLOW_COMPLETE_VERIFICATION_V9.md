@@ -8,12 +8,12 @@
 
 ## ✅ 検証完了項目
 
-### 1. GCP認証統合（ai-agent-workflow-2024）
+### 1. GCP認証統合（YOUR_GCP_PROJECT_ID）
 
 #### 1-1. 新規プロジェクト作成
 ```yaml
 status: ✅ 完了
-project_id: ai-agent-workflow-2024
+project_id: YOUR_GCP_PROJECT_ID
 creation_date: 2025-12-22
 billing_status: リンク待ち（ユーザー操作が必要）
 ```
@@ -21,8 +21,8 @@ billing_status: リンク待ち（ユーザー操作が必要）
 #### 1-2. サービスアカウント
 ```yaml
 status: ✅ 作成完了
-name: ai-agent-workflow-sa
-email: ai-agent-workflow-sa@ai-agent-workflow-2024.iam.gserviceaccount.com
+name: YOUR_SERVICE_ACCOUNT
+email: YOUR_SERVICE_ACCOUNT@YOUR_GCP_PROJECT_ID.iam.gserviceaccount.com
 roles:
   - roles/aiplatform.user (Vertex AI Imagen用)
   - roles/storage.objectAdmin (Cloud Storage用)
@@ -32,7 +32,7 @@ roles:
 #### 1-3. 認証ファイル
 ```yaml
 status: ✅ 作成完了
-path: ~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
+path: $GOOGLE_APPLICATION_CREDENTIALS
 permissions: 600 (自分のみ読み書き可能)
 format: JSON service account key
 ```
@@ -40,8 +40,8 @@ format: JSON service account key
 #### 1-4. .env設定
 ```yaml
 status: ✅ 更新完了
-GOOGLE_APPLICATION_CREDENTIALS: /Users/tsujisouhei/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
-GCP_PROJECT_ID: ai-agent-workflow-2024
+GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS
+GCP_PROJECT_ID: YOUR_GCP_PROJECT_ID
 ```
 
 #### 1-5. API有効化状態
@@ -60,7 +60,7 @@ pending_apis:
 **次のステップ**:
 ```bash
 # 請求先アカウントリンク後に実行
-gcloud services enable aiplatform.googleapis.com texttospeech.googleapis.com storage.googleapis.com --project=ai-agent-workflow-2024
+gcloud services enable aiplatform.googleapis.com texttospeech.googleapis.com storage.googleapis.com --project=YOUR_GCP_PROJECT_ID
 ```
 
 ### 2. 認証ファイル名の統一
@@ -250,10 +250,10 @@ features:
 status: ⏳ ユーザー操作待ち
 action_required:
   1. 以下のURLにアクセス
-     https://console.cloud.google.com/billing/linkedaccount?project=ai-agent-workflow-2024
+     https://console.cloud.google.com/billing/linkedaccount?project=YOUR_GCP_PROJECT_ID
   2. 請求先アカウントを選択してリンク
   3. 以下のコマンドでAPI有効化
-     gcloud services enable aiplatform.googleapis.com texttospeech.googleapis.com storage.googleapis.com --project=ai-agent-workflow-2024
+     gcloud services enable aiplatform.googleapis.com texttospeech.googleapis.com storage.googleapis.com --project=YOUR_GCP_PROJECT_ID
 ```
 
 ### 2. Text-to-Speech API用のIAM役割
@@ -328,7 +328,7 @@ gcloud services enable \
   aiplatform.googleapis.com \
   texttospeech.googleapis.com \
   storage.googleapis.com \
-  --project=ai-agent-workflow-2024
+  --project=YOUR_GCP_PROJECT_ID
 
 # 2. 画像生成テスト
 # 例: Space Shooter, RPG Game, Mobile Game
@@ -342,7 +342,7 @@ gcloud services enable \
 ## 📝 変更履歴
 
 ### v9.0 (2025-12-22)
-- GCPプロジェクト新規作成（ai-agent-workflow-2024）
+- GCPプロジェクト新規作成（YOUR_GCP_PROJECT_ID）
 - サービスアカウント作成・権限設定
 - 認証ファイル名統一（gcp-tts-key.json → gcp-workflow-key.json）
 - 全ファイルの参照を更新（MD/SH/PY）

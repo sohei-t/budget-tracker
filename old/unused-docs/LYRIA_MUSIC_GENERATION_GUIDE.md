@@ -290,7 +290,7 @@ common_negatives:
 
 ```bash
 # Vertex AI API有効化
-gcloud services enable aiplatform.googleapis.com --project=ai-agent-workflow-2024
+gcloud services enable aiplatform.googleapis.com --project=YOUR_GCP_PROJECT_ID
 ```
 
 ### Q2: "Permission denied" エラー
@@ -299,7 +299,7 @@ gcloud services enable aiplatform.googleapis.com --project=ai-agent-workflow-202
 # サービスアカウント権限確認・追加
 SA_EMAIL=$(cat $GOOGLE_APPLICATION_CREDENTIALS | python3 -c "import sys, json; print(json.load(sys.stdin)['client_email'])")
 
-gcloud projects add-iam-policy-binding ai-agent-workflow-2024 \
+gcloud projects add-iam-policy-binding YOUR_GCP_PROJECT_ID \
   --member="serviceAccount:$SA_EMAIL" \
   --role="roles/aiplatform.user"
 ```
@@ -308,7 +308,7 @@ gcloud projects add-iam-policy-binding ai-agent-workflow-2024 \
 
 ```bash
 # クォータ確認（Web推奨）
-open "https://console.cloud.google.com/apis/api/aiplatform.googleapis.com/quotas?project=ai-agent-workflow-2024"
+open "https://console.cloud.google.com/apis/api/aiplatform.googleapis.com/quotas?project=YOUR_GCP_PROJECT_ID"
 
 # 対策: 待機時間を増やす
 # audio_generator_lyria.py 内で time.sleep(5) に変更

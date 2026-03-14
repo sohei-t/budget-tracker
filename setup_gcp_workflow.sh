@@ -16,10 +16,10 @@ echo -e "${BLUE}🚀 GCPワークフロー環境セットアップ${NC}"
 echo -e "${BLUE}================================${NC}"
 echo ""
 
-PROJECT_ID="ai-agent-workflow-2024"
-SERVICE_ACCOUNT_NAME="ai-agent-workflow-sa"
-CREDENTIALS_DIR="$HOME/Desktop/git-worktree-agent/credentials"
-KEY_FILE="$CREDENTIALS_DIR/gcp-workflow-key.json"
+PROJECT_ID="${GCP_PROJECT_ID:-YOUR_GCP_PROJECT_ID}"
+SERVICE_ACCOUNT_NAME="${GCP_SERVICE_ACCOUNT:-YOUR_SERVICE_ACCOUNT_NAME}"
+CREDENTIALS_DIR="${GOOGLE_CREDENTIALS_DIR:-$HOME/.config/gcp/credentials}"
+KEY_FILE="$CREDENTIALS_DIR/gcp-credentials.json"
 
 # Step 1: プロジェクト確認
 echo -e "${YELLOW}Step 1: プロジェクト確認...${NC}"
@@ -141,8 +141,8 @@ echo ""
 # Step 7: .envファイル更新
 echo -e "${YELLOW}Step 7: .env設定...${NC}"
 
-ENV_FILE="$HOME/Desktop/git-worktree-agent/.env"
-ENV_TEMPLATE="$HOME/Desktop/git-worktree-agent/.env.template"
+ENV_FILE="${PROJECT_DIR:-.}/.env"
+ENV_TEMPLATE="${PROJECT_DIR:-.}/.env.template"
 
 # .env.templateをコピー（存在しない場合）
 if [ ! -f "$ENV_FILE" ] && [ -f "$ENV_TEMPLATE" ]; then

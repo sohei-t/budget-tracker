@@ -226,7 +226,7 @@ then:
 
 1. **GYRO_CONTROLS_STANDARD.md を読み込む**
    ```bash
-   ~/Desktop/git-worktree-agent/GYRO_CONTROLS_STANDARD.md
+   $AGENT_TEMPLATE_DIR/GYRO_CONTROLS_STANDARD.md
    ```
 
 2. **GyroControls.ts（またはGyroControls.js）作成**

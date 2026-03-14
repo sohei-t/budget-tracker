@@ -13,7 +13,7 @@ portfolio:
   demo_url: "https://github.com/[username]/ai-agent-portfolio/budget-tracker"
 
 paths:
-  agent_dir: /Users/sohei/Desktop/AI-Apps/budget-tracker-agent
+  agent_dir: .  # relative to project root
   release_dir: ~/Desktop/my-apps/budget-tracker
   portfolio_dir: ~/Desktop/GitHub/ai-agent-portfolio/budget-tracker
 

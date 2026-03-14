@@ -61,7 +61,7 @@ class GitHubIssuePRManager:
                 return result.stdout.strip()
         except:
             pass
-        return "sohei-t"  # フォールバック
+        return os.environ.get("GITHUB_USERNAME", "your-username")  # 環境変数から取得
 
     def _get_gh_command(self) -> str:
         """gh CLIのパスを取得（M4 Mac対応）"""

@@ -54,9 +54,9 @@
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/create_new_app.command:545-561` - worktree作成ロジック
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/create_new_app.command:145-187` - API認証統合
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/.env.template` - 認証情報テンプレート
+- `$AGENT_TEMPLATE_DIR/create_new_app.command:545-561` - worktree作成ロジック
+- `$AGENT_TEMPLATE_DIR/create_new_app.command:145-187` - API認証統合
+- `$AGENT_TEMPLATE_DIR/.env.template` - 認証情報テンプレート
 
 ### 判定
 🟢 **合格** - 全worktreeが正しく作成され、API認証チェックも統合済み
@@ -84,13 +84,13 @@ Task 2: Planning B (革新的)
   - 成果物: REQUIREMENTS.md, WBS.json, CRITICAL_PATH.md
 
 # 評価システム実行
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase1-planning-a phase1-planning-b
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:32-78` - Phase 1実行手順
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/autonomous_evaluator.py` - 評価システム
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:32-78` - Phase 1実行手順
+- `$AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py` - 評価システム
 
 ### 判定
 🟢 **合格** - 並列実行と自律評価の統合が正しく設計されている
@@ -137,15 +137,15 @@ Task 3: Prototype C (サーバーレス)
 - 保守性 (5%)
 
 # 評価実行（UX評価版）
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator_ux.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator_ux.py . \
   phase2-impl-prototype-a phase2-impl-prototype-b phase2-impl-prototype-c
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:81-166` - Phase 2実行手順（アーキテクチャ差別化）
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/autonomous_evaluator_ux.py` - UX重視評価システム
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/SUBAGENT_PROMPT_TEMPLATE.md:480-583` - UX重視Frontend開発プロンプト
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE.md:110-192` - UX評価基準の詳細
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:81-166` - Phase 2実行手順（アーキテクチャ差別化）
+- `$AGENT_TEMPLATE_DIR/src/autonomous_evaluator_ux.py` - UX重視評価システム
+- `$AGENT_TEMPLATE_DIR/SUBAGENT_PROMPT_TEMPLATE.md:480-583` - UX重視Frontend開発プロンプト
+- `$AGENT_TEMPLATE_DIR/CLAUDE.md:110-192` - UX評価基準の詳細
 
 ### 判定
 🟢 **合格（v9.0強化）** - アーキテクチャ差別化 + UX最優先評価システムが統合済み
@@ -179,7 +179,7 @@ Task: Testing
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:138-164` - Phase 3実行手順
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:138-164` - Phase 3実行手順
 
 ### 判定
 🟢 **合格** - テスト100%合格の徹底が明確化されている
@@ -207,12 +207,12 @@ Task 2: Quality Optimization B (パフォーマンス重視)
   - 目標: ボトルネック解消
 
 # 評価・選択
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase4-quality-opt-a phase4-quality-opt-b
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:166-202` - Phase 4実行手順
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:166-202` - Phase 4実行手順
 
 ### 判定
 🟢 **合格** - 品質改善の2アプローチが明確に定義されている
@@ -233,7 +233,7 @@ python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
 ```yaml
 # 1つのメッセージで3つのTaskを同時実行
 Task 1: Documenter
-  - python3 ~/Desktop/git-worktree-agent/src/documenter_agent.py
+  - python3 $AGENT_TEMPLATE_DIR/src/documenter_agent.py
   - README.md生成
   - about.html生成（frontend-design skill使用）
   - audio_script.txt生成
@@ -259,8 +259,8 @@ Task 3: Audio Generator（オプション）
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:204-254` - Phase 5実行手順
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/documenter_agent.py` - ドキュメント生成スクリプト
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:204-254` - Phase 5実行手順
+- `$AGENT_TEMPLATE_DIR/src/documenter_agent.py` - ドキュメント生成スクリプト
 
 ### 判定
 🟢 **合格** - 全必須タスクが明確に定義され、並列実行パターンも正しい
@@ -278,7 +278,7 @@ Task 3: Audio Generator（オプション）
 ### 実行フロー
 ```bash
 # Phase 5完了直後に自動実行
-python3 ~/Desktop/git-worktree-agent/src/delivery_organizer.py
+python3 $AGENT_TEMPLATE_DIR/src/delivery_organizer.py
 
 # 生成構造
 DELIVERY/
@@ -291,8 +291,8 @@ DELIVERY/
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:244-254` - Phase 5.5実行手順
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/delivery_organizer.py` - DELIVERY生成スクリプト
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:244-254` - Phase 5.5実行手順
+- `$AGENT_TEMPLATE_DIR/src/delivery_organizer.py` - DELIVERY生成スクリプト
 
 ### 判定
 🟢 **合格** - 固定構造の強制と自動実行が正しく設計されている
@@ -311,7 +311,7 @@ DELIVERY/
 ### 実行フロー
 ```bash
 # Phase 5.5完了直後に自動実行（Portfolio Appのみ）
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 
 # 公開先
 # - リポジトリ: ai-agent-portfolio
@@ -320,8 +320,8 @@ python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:256-267` - Phase 6実行手順
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/simplified_github_publisher.py` - GitHub公開スクリプト
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:256-267` - Phase 6実行手順
+- `$AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py` - GitHub公開スクリプト
 
 ### 判定
 🟢 **合格** - Portfolio自動公開が正しく設計されている
@@ -347,14 +347,14 @@ GITHUB_USERNAME=your-username
 export GOOGLE_APPLICATION_CREDENTIALS=...
 
 # Layer 3: テンプレート環境デフォルト
-~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
+$GOOGLE_APPLICATION_CREDENTIALS
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/.env.template` - 認証情報テンプレート
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/credential_checker.py` - 認証チェックシステム
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/tts_smart_generator.py:28-85` - TTS統合
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/simplified_github_publisher.py:20-60` - GitHub統合
+- `$AGENT_TEMPLATE_DIR/.env.template` - 認証情報テンプレート
+- `$AGENT_TEMPLATE_DIR/src/credential_checker.py` - 認証チェックシステム
+- `$AGENT_TEMPLATE_DIR/src/tts_smart_generator.py:28-85` - TTS統合
+- `$AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py:20-60` - GitHub統合
 
 ### 判定
 🟢 **合格** - API認証管理が全スクリプトに正しく統合されている
@@ -381,8 +381,8 @@ export GOOGLE_APPLICATION_CREDENTIALS=...
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/src/autonomous_evaluator.py` - 評価システム本体
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:314-356` - 評価システム使用ガイド
+- `$AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py` - 評価システム本体
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:314-356` - 評価システム使用ガイド
 
 ### 判定
 🟢 **合格** - 自律評価システムが各Phaseに正しく統合されている
@@ -392,16 +392,16 @@ export GOOGLE_APPLICATION_CREDENTIALS=...
 ## 📁 ファイルパス検証
 
 ### 確認済み全ファイル
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md` - Phase別実行セクション
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/PHASE_WORKTREE_EXECUTION_GUIDE.md` - 実行ガイド
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/create_new_app.command` - 初期化スクリプト
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/src/autonomous_evaluator.py` - 評価システム
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/src/documenter_agent.py` - ドキュメント生成
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/src/delivery_organizer.py` - DELIVERY生成
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/src/simplified_github_publisher.py` - GitHub公開
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/src/credential_checker.py` - 認証チェック
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/src/tts_smart_generator.py` - TTS生成
-✅ `/Users/tsujisouhei/Desktop/git-worktree-agent/.env.template` - 認証テンプレート
+✅ `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md` - Phase別実行セクション
+✅ `$AGENT_TEMPLATE_DIR/PHASE_WORKTREE_EXECUTION_GUIDE.md` - 実行ガイド
+✅ `$AGENT_TEMPLATE_DIR/create_new_app.command` - 初期化スクリプト
+✅ `$AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py` - 評価システム
+✅ `$AGENT_TEMPLATE_DIR/src/documenter_agent.py` - ドキュメント生成
+✅ `$AGENT_TEMPLATE_DIR/src/delivery_organizer.py` - DELIVERY生成
+✅ `$AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py` - GitHub公開
+✅ `$AGENT_TEMPLATE_DIR/src/credential_checker.py` - 認証チェック
+✅ `$AGENT_TEMPLATE_DIR/src/tts_smart_generator.py` - TTS生成
+✅ `$AGENT_TEMPLATE_DIR/.env.template` - 認証テンプレート
 
 ### 判定
 🟢 **合格** - 全ファイルパスが正しく参照されている
@@ -434,8 +434,8 @@ export GOOGLE_APPLICATION_CREDENTIALS=...
 ```
 
 ### 確認済みファイル
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/TASK_PARALLEL_EXECUTION_GUIDE.md` - 並列実行ガイド
-- `/Users/tsujisouhei/Desktop/git-worktree-agent/CLAUDE_PHASE_WORKTREE_SECTION.md:360-373` - 並列実行徹底
+- `$AGENT_TEMPLATE_DIR/TASK_PARALLEL_EXECUTION_GUIDE.md` - 並列実行ガイド
+- `$AGENT_TEMPLATE_DIR/CLAUDE_PHASE_WORKTREE_SECTION.md:360-373` - 並列実行徹底
 
 ### 判定
 🟢 **合格** - 並列実行パターンが全Phaseで正しく設計されている

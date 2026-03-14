@@ -11,7 +11,7 @@
 ### TC1: TTS自動生成（認証ファイルなし→自動セットアップ）
 
 **前提条件:**
-- `~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json` が存在しない
+- `$GOOGLE_APPLICATION_CREDENTIALS` が存在しない
 - GCPプロジェクトが設定済み（`gcloud config get-value project`）
 
 **実行手順:**
@@ -20,14 +20,14 @@
 
 **期待結果:**
 - ✅ GCP TTSセットアップ完了メッセージ表示
-- ✅ `~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json` 生成
+- ✅ `$GOOGLE_APPLICATION_CREDENTIALS` 生成
 - ✅ `explanation.mp3` 生成
 - ✅ about.htmlに音声プレーヤー埋め込み
 
 **検証コマンド:**
 ```bash
 # 認証ファイル確認
-ls -la ~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
+ls -la $GOOGLE_APPLICATION_CREDENTIALS
 
 # 音声ファイル確認
 ls -la ./worktrees/mission-*/explanation.mp3
@@ -41,7 +41,7 @@ grep -i "audio" ./worktrees/mission-*/about.html
 ### TC2: TTS自動生成（認証ファイル既存）
 
 **前提条件:**
-- `~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json` が存在
+- `$GOOGLE_APPLICATION_CREDENTIALS` が存在
 - 有効なGCP認証
 
 **実行手順:**
@@ -243,7 +243,7 @@ cat ./worktrees/mission-*/README.md | grep -A 3 "生成コスト"
    gcloud services list --enabled | grep texttospeech
 
 4. 手動セットアップ試行
-   cd ~/Desktop/git-worktree-agent
+   cd $AGENT_TEMPLATE_DIR
    bash GCP_TTS_SETUP.md の手順を実行
 ```
 

@@ -43,7 +43,7 @@ Phase 5.5完了済み:
 3. "Client App" の場合はスキップ
 
 実行コマンド:
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 ```
 
 **Python実装確認（20-30行目）:**

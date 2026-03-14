@@ -70,7 +70,7 @@ class CredentialChecker:
 
         if not cred_path:
             # フォールバック: テンプレート環境を探す
-            template_cred = self.template_path / "credentials" / "gcp-workflow-key.json"
+            template_cred = self.template_path / "credentials" / "gcp-credentials.json"
             if template_cred.exists():
                 cred_path = str(template_cred)
                 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = cred_path

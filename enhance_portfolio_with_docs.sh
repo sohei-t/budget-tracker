@@ -36,14 +36,15 @@ PROJECT_NAME=$(grep "name:" PROJECT_INFO.yaml | head -1 | awk '{print $2}')
 echo -e "${GREEN}プロジェクト: ${PROJECT_NAME}${NC}"
 
 # portfolio_doc_generator.py をコピー
-GENERATOR_SCRIPT="$HOME/Desktop/git-worktree-agent/src/portfolio_doc_generator.py"
+AGENT_TEMPLATE_DIR="${AGENT_TEMPLATE_DIR:-$(cd "$(dirname "$0")" && pwd)}"
+GENERATOR_SCRIPT="$AGENT_TEMPLATE_DIR/src/portfolio_doc_generator.py"
 if [ ! -f "$GENERATOR_SCRIPT" ]; then
     echo -e "${RED}❌ portfolio_doc_generator.py が見つかりません${NC}"
     exit 1
 fi
 
 # enhanced_client_document_generator.py も必要
-ENHANCED_GENERATOR="$HOME/Desktop/git-worktree-agent/src/enhanced_client_document_generator.py"
+ENHANCED_GENERATOR="$AGENT_TEMPLATE_DIR/src/enhanced_client_document_generator.py"
 if [ ! -f "$ENHANCED_GENERATOR" ]; then
     echo -e "${RED}❌ enhanced_client_document_generator.py が見つかりません${NC}"
     exit 1
@@ -58,7 +59,7 @@ cp "$GENERATOR_SCRIPT" src/
 cp "$ENHANCED_GENERATOR" src/
 
 # PDF変換スクリプトもコピー（存在する場合）
-PDF_CONVERTER="$HOME/Desktop/git-worktree-agent/src/pdf_converter.js"
+PDF_CONVERTER="$AGENT_TEMPLATE_DIR/src/pdf_converter.js"
 if [ -f "$PDF_CONVERTER" ]; then
     cp "$PDF_CONVERTER" src/
     echo -e "${GREEN}✅ PDF変換スクリプトもコピーしました${NC}"

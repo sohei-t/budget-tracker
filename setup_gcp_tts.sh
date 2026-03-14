@@ -19,7 +19,7 @@ echo -e "${BLUE}================================${NC}"
 
 CURRENT_DIR=$(pwd)
 CREDENTIALS_DIR="${CURRENT_DIR}/credentials"
-KEY_FILE="${CREDENTIALS_DIR}/gcp-workflow-key.json"
+KEY_FILE="${CREDENTIALS_DIR}/gcp-credentials.json"
 
 # credentialsディレクトリを作成
 mkdir -p "$CREDENTIALS_DIR"

@@ -6,7 +6,7 @@ Claude Codeは起動時に以下を確認してください：
 
 ### 1. テンプレート環境の場合
 ```
-パス: ~/Desktop/git-worktree-agent/
+パス: $AGENT_TEMPLATE_DIR/
 ファイル: create_new_app.command が存在
 ```
 → **アプリ開発を依頼されたら：**

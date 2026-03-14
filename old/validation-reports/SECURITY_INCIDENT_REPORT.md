@@ -50,14 +50,14 @@ gcloud iam service-accounts keys delete db01c51c91401dd170ac8f968e78f4f7faa93194
   --iam-account=imagen-generator@text-to-speech-app-1751525744.iam.gserviceaccount.com
 
 # 4. 新しいキーを生成
-gcloud iam service-accounts keys create ~/Desktop/git-worktree-agent/credentials/imagen-key-new.json \
+gcloud iam service-accounts keys create $AGENT_TEMPLATE_DIR/credentials/imagen-key-new.json \
   --iam-account=imagen-generator@text-to-speech-app-1751525744.iam.gserviceaccount.com
 
 # 5. 古いキーファイルを削除
-rm ~/Desktop/git-worktree-agent/credentials/imagen-key.json
-mv ~/Desktop/git-worktree-agent/credentials/imagen-key-new.json \
-   ~/Desktop/git-worktree-agent/credentials/imagen-key.json
-chmod 600 ~/Desktop/git-worktree-agent/credentials/imagen-key.json
+rm $AGENT_TEMPLATE_DIR/credentials/imagen-key.json
+mv $AGENT_TEMPLATE_DIR/credentials/imagen-key-new.json \
+   $AGENT_TEMPLATE_DIR/credentials/imagen-key.json
+chmod 600 $AGENT_TEMPLATE_DIR/credentials/imagen-key.json
 ```
 
 ### 🚨 STEP 2: Git履歴から秘密鍵を完全削除
@@ -93,7 +93,7 @@ git push --force
 brew install git-filter-repo
 
 # 2. リポジトリで実行
-cd ~/Desktop/git-worktree-agent
+cd $AGENT_TEMPLATE_DIR
 git filter-repo --path credentials/imagen-key.json --invert-paths
 
 # 3. リモート再設定
@@ -108,16 +108,16 @@ git push --force --tags
 
 ```bash
 # 1. 現在のリポジトリをバックアップ
-mv ~/Desktop/git-worktree-agent ~/Desktop/git-worktree-agent-backup
+mv $AGENT_TEMPLATE_DIR $AGENT_TEMPLATE_DIR-backup
 
 # 2. 新規リポジトリを作成
-mkdir ~/Desktop/git-worktree-agent
-cd ~/Desktop/git-worktree-agent
+mkdir $AGENT_TEMPLATE_DIR
+cd $AGENT_TEMPLATE_DIR
 git init
 
 # 3. 必要なファイルのみコピー（credentials/を除外）
 rsync -av --exclude='.git' --exclude='credentials/' \
-  ~/Desktop/git-worktree-agent-backup/ .
+  $AGENT_TEMPLATE_DIR-backup/ .
 
 # 4. .gitignoreを強化してからコミット
 # （後述の.gitignore更新を参照）

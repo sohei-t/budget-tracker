@@ -26,7 +26,7 @@ class GitHubPublisherV8:
         self.delivery_path = self.project_path / "DELIVERY"
 
         # ハードコードされたリポジトリ設定
-        self.github_username = "sohei-t"
+        self.github_username = os.environ.get("GITHUB_USERNAME", "your-username")
         self.repo_name = "ai-agent-portfolio"
         self.portfolio_repo = Path.home() / "Desktop" / "GitHub" / self.repo_name
         self.remote_url = f"https://github.com/{self.github_username}/{self.repo_name}.git"

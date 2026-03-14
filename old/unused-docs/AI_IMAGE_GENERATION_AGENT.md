@@ -21,7 +21,7 @@ Google Imagen API を活用し、一貫性のあるゲームグラフィック�
 【作業環境】
 - 作業ディレクトリ: ./worktrees/mission-{プロジェクト名}/
 - AI_IMAGE_GENERATION_SPEC.md を参照
-- Google Cloud 認証情報: ~/Desktop/git-worktree-agent/credentials/imagen-key.json
+- Google Cloud 認証情報: $AGENT_TEMPLATE_DIR/credentials/imagen-key.json
 
 【実装タスク】
 
@@ -178,7 +178,7 @@ class ImagenAPIClient {
   async setup() {
     // Google Cloud 認証設定
     process.env.GOOGLE_APPLICATION_CREDENTIALS =
-      path.resolve('~/Desktop/git-worktree-agent/credentials/imagen-key.json');
+      path.resolve('$AGENT_TEMPLATE_DIR/credentials/imagen-key.json');
 
     const { GoogleAuth } = require('google-auth-library');
     this.auth = new GoogleAuth({

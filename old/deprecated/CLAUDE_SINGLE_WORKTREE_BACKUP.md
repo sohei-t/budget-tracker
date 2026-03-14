@@ -137,7 +137,7 @@ token_optimization:
 ### STEP -2: API認証チェック（推奨）
 ```bash
 # 認証状態を確認（専用環境で実行）
-python3 ~/Desktop/git-worktree-agent/src/credential_checker.py .
+python3 $AGENT_TEMPLATE_DIR/src/credential_checker.py .
 
 # 出力例:
 # ✅ GCP (Text-to-Speech & Imagen): OK
@@ -875,7 +875,7 @@ documenter_agent.py失敗時の対応:
 Task 1: Documenter（最重要 - 絶対に忘れない）
 - prompt: SUBAGENT_PROMPT_TEMPLATE.md の「14. Documenter」
 - 必須実行コマンド:
-  * テンプレート環境: python3 ~/Desktop/git-worktree-agent/src/documenter_agent.py
+  * テンプレート環境: python3 $AGENT_TEMPLATE_DIR/src/documenter_agent.py
   * 専用環境: python3 ../src/documenter_agent.py (worktree内から実行)
   * または: python3 ./src/documenter_agent.py (エージェント環境ルートから実行)
 - 検証項目:
@@ -892,7 +892,7 @@ Task 2: Launcher Creator
 Task 3: Audio Generator（GCP認証の自動セットアップ付き）
 - prompt: 音声生成用プロンプト（以下参照）
 - 実行フロー:
-  1. 認証ファイル確認（~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json）
+  1. 認証ファイル確認（$GOOGLE_APPLICATION_CREDENTIALS）
   2. 存在しない場合: use the gcp skill を宣言し、自動セットアップ実行
   3. 存在する場合: そのまま音声生成実行
 - 生成物: explanation.mp3（認証セットアップ成功時）
@@ -1037,7 +1037,7 @@ Task 3: Audio Generator（GCP認証の自動セットアップ付き）
 =================================
 
 実行コマンド:
-python3 ~/Desktop/git-worktree-agent/src/delivery_organizer.py
+python3 $AGENT_TEMPLATE_DIR/src/delivery_organizer.py
 
 確認項目:
 ✅ DELIVERYフォルダが生成されているか
@@ -1059,7 +1059,7 @@ python3 ~/Desktop/git-worktree-agent/src/delivery_organizer.py
 3. "Client App" の場合はスキップ
 
 実行コマンド:
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 
 🔴 定型タスク（必ず実行）:
 ✅ リモートリポジトリ: https://github.com/sohei-t/ai-agent-portfolio
@@ -1154,7 +1154,7 @@ Phase 5の全タスク完了後、自動的に実行
 ### 実行方法
 ```bash
 # Phase 5完了後に自動実行
-python3 ~/Desktop/git-worktree-agent/src/delivery_organizer.py
+python3 $AGENT_TEMPLATE_DIR/src/delivery_organizer.py
 ```
 
 ### DELIVERYフォルダ構造
@@ -1278,7 +1278,7 @@ git commit -m "feat: {app-name} - AI-generated full-stack application with docum
 **Option A: 統合ポートフォリオ方式**（複数アプリを1箇所で管理）
 ```bash
 # ai-agent-portfolioリポジトリ（main）に追加/更新（公開物のみ）
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 
 # 結果: ai-agent-portfolio/{app-name}/ （日付なしのslug形式、既存の場合は上書き更新）
 ```
@@ -1286,7 +1286,7 @@ python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
 **Option B: 個別リポジトリ方式**（アプリ専用リポジトリ）
 ```bash
 # 新規リポジトリ作成（portfolio-todo-app）
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 
 # 結果: portfolio-todo-app リポジトリ
 ```
@@ -1294,8 +1294,8 @@ python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
 **Option C: 両方実行**（推奨）
 ```bash
 # 統合と個別の両方に公開
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .   # ai-agent-portfolio 直下に配置
-python3 ~/Desktop/git-worktree-agent/src/github_portfolio_publisher.py .     # 個別リポジトリを作成/更新
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .   # ai-agent-portfolio 直下に配置
+python3 $AGENT_TEMPLATE_DIR/src/github_portfolio_publisher.py .     # 個別リポジトリを作成/更新
 ```
 ※ 既存の `<app-name>/` が ai-agent-portfolio にある場合は同名フォルダを再利用し、中身だけを更新する（フォルダ名は変更しない）。
 
@@ -1393,13 +1393,13 @@ https://{username}.github.io/{repo-name}/{app-name}/
 
 A. 統合ポートフォリオ（複数アプリ管理）
    ```bash
-   python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+   python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
    ```
    結果: ai-agent-portfolio/{app-name}/ （日付なしslug）
 
 B. 個別リポジトリ（アプリ専用）
    ```bash
-   python3 ~/Desktop/git-worktree-agent/src/github_portfolio_publisher.py .
+   python3 $AGENT_TEMPLATE_DIR/src/github_portfolio_publisher.py .
    ```
    結果: portfolio-todo-app リポジトリ
 

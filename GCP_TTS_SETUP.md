@@ -129,7 +129,7 @@ gcloud projects add-iam-policy-binding [PROJECT_ID] \
   --role="roles/cloudtts.admin"
 
 # キー作成
-gcloud iam service-accounts keys create ~/Downloads/gcp-workflow-key.json \
+gcloud iam service-accounts keys create ~/Downloads/gcp-credentials.json \
   --iam-account=tts-agent@[PROJECT_ID].iam.gserviceaccount.com
 ```
 

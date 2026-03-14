@@ -15,7 +15,7 @@ create_new_app.commandから始まる実際の開発フローを検証し、専�
 **問題詳細:**
 - CLAUDE.mdがハードコードされたパスを使用:
   ```bash
-  ~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json
+  $GOOGLE_APPLICATION_CREDENTIALS
   ```
 - しかし専用環境の実際のパス:
   ```bash
@@ -37,7 +37,7 @@ create_new_app.commandから始まる実際の開発フローを検証し、専�
 ### ❌ 問題3: documenter_agent.pyパスの固定化
 
 **問題詳細:**
-- Phase 5で`python3 ~/Desktop/git-worktree-agent/src/documenter_agent.py`を実行
+- Phase 5で`python3 $AGENT_TEMPLATE_DIR/src/documenter_agent.py`を実行
 - 専用環境には存在しない
 - → documenter_agent.py実行失敗 → about.html生成失敗
 
@@ -130,7 +130,7 @@ echo "credentials/*.json" >> .gitignore
 Task 1: Documenter（最重要 - 絶対に忘れない）
 - prompt: SUBAGENT_PROMPT_TEMPLATE.md の「14. Documenter」
 - 必須実行コマンド:
-  * テンプレート環境: python3 ~/Desktop/git-worktree-agent/src/documenter_agent.py
+  * テンプレート環境: python3 $AGENT_TEMPLATE_DIR/src/documenter_agent.py
   * 専用環境: python3 ../src/documenter_agent.py (worktree内から実行)
   * または: python3 ./src/documenter_agent.py (エージェント環境ルートから実行)
 ```
@@ -143,7 +143,7 @@ Task 1: Documenter（最重要 - 絶対に忘れない）
 
 ```bash
 # ユーザー操作
-$ open ~/Desktop/git-worktree-agent/create_new_app.command
+$ open $AGENT_TEMPLATE_DIR/create_new_app.command
 ```
 
 **実行内容:**
@@ -404,7 +404,7 @@ pwd: ~/Desktop/AI-Apps/space-shooter-agent/worktrees/mission-space-shooter/
 
 | 環境 | パス | 認証検出 | 動作 |
 |------|------|---------|------|
-| **テンプレート** | ~/Desktop/git-worktree-agent/ | ✅ | ✅ |
+| **テンプレート** | $AGENT_TEMPLATE_DIR/ | ✅ | ✅ |
 | **専用（AI-Apps）** | ~/Desktop/AI-Apps/{app}-agent/ | ✅ | ✅ |
 
 ### フロー完全性

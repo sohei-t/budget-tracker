@@ -44,7 +44,7 @@ ls -la worktrees/
 cat .env | grep GOOGLE_APPLICATION_CREDENTIALS
 
 # 認証状態確認
-python3 ~/Desktop/git-worktree-agent/src/credential_checker.py .
+python3 $AGENT_TEMPLATE_DIR/src/credential_checker.py .
 ```
 
 ### 実行場所
@@ -78,7 +78,7 @@ python3 ~/Desktop/git-worktree-agent/src/credential_checker.py .
 
 #### 自律評価
 ```bash
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase1-planning-a phase1-planning-b
 
 # 出力: EVALUATION_REPORT.json
@@ -127,7 +127,7 @@ git merge phase/planning-a  # または planning-b（評価結果に基づく）
 
 #### 自律評価
 ```bash
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase2-impl-prototype-a phase2-impl-prototype-b phase2-impl-prototype-c
 
 # 評価軸:
@@ -217,7 +217,7 @@ git merge phase/testing
 
 #### 自律評価
 ```bash
-python3 ~/Desktop/git-worktree-agent/src/autonomous_evaluator.py . \
+python3 $AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py . \
   phase4-quality-opt-a phase4-quality-opt-b
 ```
 
@@ -288,7 +288,7 @@ git merge phase/delivery
 #### 自動実行
 ```bash
 # Phase 5完了直後に自動実行
-python3 ~/Desktop/git-worktree-agent/src/delivery_organizer.py
+python3 $AGENT_TEMPLATE_DIR/src/delivery_organizer.py
 ```
 
 #### 確認項目
@@ -323,7 +323,7 @@ ls DELIVERY/<app-name>/
 #### 自動実行
 ```bash
 # Phase 5.5完了直後に自動実行（Portfolio Appの場合のみ）
-python3 ~/Desktop/git-worktree-agent/src/simplified_github_publisher.py .
+python3 $AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py .
 ```
 
 #### 確認項目
@@ -411,19 +411,19 @@ weights:
 #### 重要スクリプトのパス
 ```bash
 # autonomous_evaluator.py
-~/Desktop/git-worktree-agent/src/autonomous_evaluator.py
+$AGENT_TEMPLATE_DIR/src/autonomous_evaluator.py
 
 # documenter_agent.py
-~/Desktop/git-worktree-agent/src/documenter_agent.py
+$AGENT_TEMPLATE_DIR/src/documenter_agent.py
 
 # delivery_organizer.py
-~/Desktop/git-worktree-agent/src/delivery_organizer.py
+$AGENT_TEMPLATE_DIR/src/delivery_organizer.py
 
 # simplified_github_publisher.py
-~/Desktop/git-worktree-agent/src/simplified_github_publisher.py
+$AGENT_TEMPLATE_DIR/src/simplified_github_publisher.py
 
 # credential_checker.py
-~/Desktop/git-worktree-agent/src/credential_checker.py
+$AGENT_TEMPLATE_DIR/src/credential_checker.py
 ```
 
 #### worktreeパス
@@ -676,7 +676,7 @@ Phase別worktreeシステムは実践準備完了です：
 
 # 認証確認
 cd ~/Desktop/AI-Apps/{app-name}-agent/
-python3 ~/Desktop/git-worktree-agent/src/credential_checker.py .
+python3 $AGENT_TEMPLATE_DIR/src/credential_checker.py .
 
 # Phase別worktree確認
 ls worktrees/

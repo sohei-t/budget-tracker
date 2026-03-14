@@ -45,7 +45,7 @@ class SmartTTSGenerator:
             self._load_env_file()
             self.credentials_path = os.environ.get(
                 'GOOGLE_APPLICATION_CREDENTIALS',
-                os.path.expanduser("~/Desktop/git-worktree-agent/credentials/gcp-workflow-key.json")
+                ''
             )
 
         self.client = None
@@ -468,7 +468,7 @@ workflow_tasks.append({
 '''
 
     # 統合ファイルを作成
-    with open('/Users/tsujisouhei/Desktop/git-worktree-agent/src/workflow_tts_integration.py', 'w') as f:
+    with open(os.path.join(os.path.dirname(__file__), 'workflow_tts_integration.py'), 'w') as f:
         f.write(integration_code)
 
     print("\n📝 ワークフロー統合コードを生成しました")
@@ -482,7 +482,7 @@ if __name__ == "__main__":
     tts = SmartTTSGenerator()
 
     # SSMLファイルを読み込み
-    ssml_path = "/Users/tsujisouhei/Desktop/3d-shooting-game/docs/narration_script.ssml"
+    ssml_path = "./docs/narration_script.ssml"
     if os.path.exists(ssml_path):
         with open(ssml_path, 'r', encoding='utf-8') as f:
             script = f.read()
@@ -490,9 +490,9 @@ if __name__ == "__main__":
         # 1つのファイルに結合して生成
         success, stats = tts.generate_from_text(
             text=script,
-            output_path="/Users/tsujisouhei/Desktop/3d-shooting-game/docs/narration_complete.mp3"
+            output_path="./docs/narration_complete.mp3"
         )
 
         if success:
             print("\n🎧 音声を再生:")
-            print("open /Users/tsujisouhei/Desktop/3d-shooting-game/docs/narration_complete.mp3")
+            print("open ./docs/narration_complete.mp3")
